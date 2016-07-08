@@ -2,6 +2,7 @@ import pickle
 
 ingredient_dictionary = {
 'cake': {'pound':None},
+'juice': {'orange':None, 'lemon':None, 'lime':None, 'watermelon':None, 'cherry':None, 'apple':None},
 'batter': {'cake':None, 'pancake':None},
 'bok': {'choy': None, 'choi':None},
 'baba': {'ghanous':None},
@@ -12,7 +13,7 @@ ingredient_dictionary = {
 'bread': {'potato':None, 'crumbs':None, 'pumpernickel':None, 'rye':None, 'ciabatta':None, 'white':None, 'french':None},
 'butter': {'apple': None, 'almond': None, 'clarified': None, 'macadamia': None, 'peanut':None},
 'bacon': {'canadian': None, 'grease':None},
-'cheese': {'brie':None, 'boursin': None, 'cheddar': None, 'asiago': None, 'beer': None, 'brick': None, 'buxton': None, 'blue': None, 'basket': None, 'banon': None, 'chesire': None, 'cottage': None, 'cream': None, 'derby': None, 'dovedale': None, 'farmer': None, 'feta': None, 'fontina': None, 'grating': None, 'hard': None, 'hispanic': None, 'jack': None, 'lancashire': None, 'mimolette': None, 'babybel': None, 'parmesan': None, 'filata': None, 'processed': None, 'ricotta': None, 'romano': None, 'provel': None, 'rope': None, 'semi-hard': None, 'shropshire':None, 'soft':None, 'spanish':None, 'specialty':None, 'swiss':None, 'washed-rind':None, 'wensleydale':None},
+'cheese': {'goat':None, 'brie':None, 'boursin': None, 'cheddar': None, 'asiago': None, 'beer': None, 'brick': None, 'buxton': None, 'blue': None, 'basket': None, 'banon': None, 'chesire': None, 'cottage': None, 'cream': None, 'derby': None, 'dovedale': None, 'farmer': None, 'feta': None, 'fontina': None, 'grating': None, 'hard': None, 'hispanic': None, 'jack': None, 'lancashire': None, 'mimolette': None, 'babybel': None, 'parmesan': None, 'filata': None, 'processed': None, 'ricotta': None, 'romano': None, 'provel': None, 'rope': None, 'semi-hard': None, 'shropshire':None, 'soft':None, 'spanish':None, 'specialty':None, 'swiss':None, 'washed-rind':None, 'wensleydale':None},
 'cherry': {'amarena': None, 'maraschino':None },
 'cabbage': {'chinese':None},
 'beef': {'corned':None, 'salted':None, 'jerky':None},
@@ -91,7 +92,7 @@ ingredient_dictionary = {
 'roll': {'jelly': None, 'cottage': None},
 'lettuce': {'romaine': None, 'bibb':None, 'iceberg':None},
 'recado': {'rojo': None},
-'sauce': {'horseradish':None, 'spaghetti':None, 'red':None, 'white':None, 'chili': None, 'fish': None, 'hoisin': None, 'oyster': None, 'apple': None, 'alfredo': None, 'marinara':None, 'bean': None, 'hot': None, 'soy': None, 'barbecue': None, 'pie': None, 'tabasco': None, 'tartar': None, 'worcestershire': None},
+'sauce': {'sriracha':None, 'horseradish':None, 'spaghetti':None, 'red':None, 'white':None, 'chili': None, 'fish': None, 'hoisin': None, 'oyster': None, 'apple': None, 'alfredo': None, 'marinara':None, 'bean': None, 'hot': None, 'soy': None, 'barbecue': None, 'pie': None, 'tabasco': None, 'tartar': None, 'worcestershire': None},
 'sausage': {'chaurice': None, 'andouille': None, 'creole': None, 'breakfast':None},
 'sea': {'cucumber': None},
 'seasoning': {'poultry': None, 'smoke': None},

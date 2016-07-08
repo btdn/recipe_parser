@@ -45,7 +45,7 @@ def extractIngredientKeysPruning(ingredient):
 				ingredientsCopy.remove(wordChunk)
 			elif wordChunk in cookingDescriptions:
 				ingredientsCopy.remove(wordChunk)
-	return Set(ingredientsCopy)
+	return ingredientsCopy
 
 def cleanRawString(wordChunk):
 	wordChunk = wordChunk.replace("'", "")
@@ -87,11 +87,9 @@ def extractIngredientKeys(ingredient):
 
 def extractInstructionKeys(instruction):
 	splitInstruction = [cleanRawString(str(x.encode('ascii','ignore'))) for x in instruction.split()]
-	print splitInstruction
-	return Set(splitInstruction)
+	return splitInstruction
 
 def extractInstructionLabel(instruction, labels):
-	print instruction
 	flag = True
 	backup = []
 	assured = []
@@ -106,7 +104,7 @@ def extractInstructionLabel(instruction, labels):
 	elif len(backup) > 0:
 		return backup
 	else:
-		return labels
+		return list(labels)
 
 def print_fine_pos(token):
     return (token.tag_)
@@ -119,6 +117,8 @@ def pos_tags(sentence):
         	tags.append(cleanRawString(str(tok)))
     return Set(tags)
 
+#set of tuples of used ingredients + the new ingredient
+
 query = ("SELECT ingredients, recipe_instructions FROM cooking_recipes_reformat WHERE type='sandwich'") 
 cursor.execute(query)
 results = cursor.fetchall()
@@ -126,20 +126,63 @@ results = cursor.fetchall()
 for rawIngr, rawInstr in results:
 	ingredients = []
 	instructions = []
+
+	#pre-processing so that each block-text is split accordingly
+
 	ingrArr = rawIngr.split(', u')
 	for x in ingrArr:
 		ingredients.append(extractIngredientKeys(x.split()))
 	lineInstructions = rawInstr.split('.')
+
+	#For each line of instructions
 	for instruction in lineInstructions:
 		labels = pos_tags(instruction)
 		instruction = unicodedata.normalize('NFKD', instruction).encode('ascii','ignore')
-		target.write(instruction + "\n")
+	#	target.write(instruction + "\n")
+		print instruction
 		instructionKeys = extractInstructionKeys(instruction)
 		finalLabel = extractInstructionLabel(instructionKeys, labels)
-		target.write(str(finalLabel) + "\n")
-	 	for ingredient in ingredients:
-	 		if (ingredient & instructionKeys):
-	 			target.write("Associated Ingredients: " + str(ingredient & instructionKeys) + "\n")
-		target.write("####################################" + "\n")
+		print finalLabel
+		print ingredients
+		compoundFlag = False
+		
+	#	target.write(str(finalLabel) + "\n")
+		usedIngredients = [0] * len(ingredients)
+		finalAssociations = {}
+	 	currIndex = 0
+	 	currAction ='#no-action#'
+	 	finalAssociations[currAction] = []
+	 	for x in range(len(instructionKeys)):
+	 		wordChunk = instructionKeys[x]
+	 		associatedIngredient = []
+
+	 		if compoundFlag:
+	 			compoundFlag = False
+	 			continue
+	 		if currIndex < len(finalLabel) and wordChunk is finalLabel[currIndex]:
+	 			currIndex += 1
+	 			finalAssociations[wordChunk] = []
+	 			currAction = wordChunk
+	 		for y in range(len(ingredients)):
+	 			ingredient = ingredients[y]
+	 			ingrSet = Set(ingredient)
+	 			if wordChunk in ingrSet and not usedIngredients[y]:
+	 				associatedIngredient.append(wordChunk)
+	 				if len(ingrSet) > 1:
+	 					if (x < len(instructionKeys)-1 and instructionKeys[x+1] in ingrSet):
+	 						associatedIngredient.append(instructionKeys[x+1]) 
+	 						compoundFlag = True
+	 				usedIngredients[y] = 1
+	 				break
+
+	 		if (len(associatedIngredient) > 0):
+	 			print "Associated Ingredients: " + str(associatedIngredient)
+	 			finalAssociations[currAction].append(associatedIngredient)
+	 	print "Final Associations: ", finalAssociations
+	 	#	if (ingrSet & instructionKeys):
+	 	#		print "Associated Ingredients: " + str(ingrSet & instructionKeys)
+	#			target.write("Associated Ingredients: " + str(ingredient & instructionKeys) + "\n")
+		print "#####################################"
+	#	target.write("####################################" + "\n")
 target.close()
 
