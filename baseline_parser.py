@@ -28,9 +28,9 @@ compoundIngredientDict = pickle.load( open( "save_compound_ingredients.p", "rb" 
 ingredientSet = Set(pickle.load( open( "save_ingredient_list.p", "rb" ) ) )
 cookingVerbSet = Set(pickle.load( open( "save_cooking_verb.p", "rb" ) ) )
 
-print "Opening the file..."
-target = open('output-jul-8-2016.txt', 'w')
-target.truncate()
+#print "Opening the file..."
+#target = open('output-jul-8-2016.txt', 'w')
+#target.truncate()
 
 def extractIngredientKeysPruning(ingredient):
 	ingredientsCopy = deepcopy(ingredient)
@@ -119,18 +119,31 @@ def pos_tags(sentence):
 
 #set of tuples of used ingredients + the new ingredient
 
-query = ("SELECT ingredients, recipe_instructions FROM cooking_recipes_reformat WHERE type='sandwich'") 
+query = ("SELECT name, type, ingredients, recipe_instructions FROM cooking_recipes_reformat WHERE type='sandwich'") 
 cursor.execute(query)
 results = cursor.fetchall()
 
-for rawIngr, rawInstr in results:
+for name, type, rawIngr, rawInstr in results:
 	ingredients = []
 	instructions = []
+
+	#INSERT INTO TABLE: recipe
+	query = ("INSERT INTO recipes(recipe_name, type) VALUES(%s, %s)")
+	cursor.execute(query, (name, type))
+	link.commit()
+	query = ("SELECT LAST_INSERT_ID()")
+	cursor.execute(query)
+	recipe_id = cursor.fetchone()[0]
 
 	#pre-processing so that each block-text is split accordingly
 
 	ingrArr = rawIngr.split(', u')
 	for x in ingrArr:
+		#INSERT INTO TABLE: ingredients
+		ingredient = extractIngredientKeys(x.split())
+		query = ("INSERT INTO ingredients(recipe_id, text_name) VALUES(%s, %s)")
+		cursor.execute(query, (recipe_id, ' '.join(ingredient)))
+		link.commit()
 		ingredients.append(extractIngredientKeys(x.split()))
 	lineInstructions = rawInstr.split('.')
 
@@ -138,16 +151,25 @@ for rawIngr, rawInstr in results:
 	for instruction in lineInstructions:
 		labels = pos_tags(instruction)
 		instruction = unicodedata.normalize('NFKD', instruction).encode('ascii','ignore')
-		target.write(instruction + "\n")
+		#target.write(instruction + "\n")
+		#INSERT INTO TABLE: steps
+		query = ("INSERT INTO steps(recipe_id, text_line) VALUES(%s, %s)")
+		cursor.execute(query, (recipe_id, instruction))
+		link.commit()
+		query = ("SELECT LAST_INSERT_ID()")
+		cursor.execute(query)
+		step_id = cursor.fetchone()[0]
+
 		instructionKeys = extractInstructionKeys(instruction)
 		finalLabel = extractInstructionLabel(instructionKeys, labels)
-		target.write("Ingredients: " + str(ingredients) + "\n")
+		#target.write("Ingredients: " + str(ingredients) + "\n")
 		compoundFlag = False
 		
-		target.write(str(finalLabel) + "\n")
+		#target.write(str(finalLabel) + "\n")
 		usedIngredients = [0] * len(ingredients)
 		finalAssociations = {}
 	 	currIndex = 0
+	 	rank = 0
 	 	currAction ='#no-action#'
 	 	finalAssociations[currAction] = []
 	 	for x in range(len(instructionKeys)):
@@ -159,6 +181,10 @@ for rawIngr, rawInstr in results:
 	 			continue
 	 		if currIndex < len(finalLabel) and wordChunk is finalLabel[currIndex]:
 	 			currIndex += 1
+	 			query = ("INSERT INTO node(recipe_id, step_id, class, rank, text) VALUES(%s, %s, %s, %s, %s)")
+				cursor.execute(query, (recipe_id, step_id, 'action', rank, wordChunk))
+				link.commit()
+				rank += 1
 	 			finalAssociations[wordChunk] = []
 	 			currAction = wordChunk
 	 		for y in range(len(ingredients)):
@@ -175,11 +201,15 @@ for rawIngr, rawInstr in results:
 
 	 		if (len(associatedIngredient) > 0):
 	 			print "Associated Ingredients: " + str(associatedIngredient)
-	 			target.write("Associated Ingredients: " + str(associatedIngredient) + "\n")
+	 			query = ("INSERT INTO node(recipe_id, step_id, class, rank, text) VALUES(%s, %s, %s, %s, %s)")
+				cursor.execute(query, (recipe_id, step_id, 'ingredient', rank, ' '.join(associatedIngredient)))
+				link.commit()
+				rank += 1
+	 			#target.write("Associated Ingredients: " + str(associatedIngredient) + "\n")
 	 			finalAssociations[currAction].append(associatedIngredient)
 	 	print "Final Associations: ", finalAssociations
-	 	target.write("Final Associations: " + str(finalAssociations) + "\n")
+	 	#target.write("Final Associations: " + str(finalAssociations) + "\n")
 		print "#####################################"
-		target.write("####################################" + "\n")
-target.close()
+		#target.write("####################################" + "\n")
+#target.close()
 
