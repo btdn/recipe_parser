@@ -138,15 +138,13 @@ for rawIngr, rawInstr in results:
 	for instruction in lineInstructions:
 		labels = pos_tags(instruction)
 		instruction = unicodedata.normalize('NFKD', instruction).encode('ascii','ignore')
-	#	target.write(instruction + "\n")
-		print instruction
+		target.write(instruction + "\n")
 		instructionKeys = extractInstructionKeys(instruction)
 		finalLabel = extractInstructionLabel(instructionKeys, labels)
-		print finalLabel
-		print ingredients
+		target.write("Ingredients: " + str(ingredients) + "\n")
 		compoundFlag = False
 		
-	#	target.write(str(finalLabel) + "\n")
+		target.write(str(finalLabel) + "\n")
 		usedIngredients = [0] * len(ingredients)
 		finalAssociations = {}
 	 	currIndex = 0
@@ -177,12 +175,11 @@ for rawIngr, rawInstr in results:
 
 	 		if (len(associatedIngredient) > 0):
 	 			print "Associated Ingredients: " + str(associatedIngredient)
+	 			target.write("Associated Ingredients: " + str(associatedIngredient) + "\n")
 	 			finalAssociations[currAction].append(associatedIngredient)
 	 	print "Final Associations: ", finalAssociations
-	 	#	if (ingrSet & instructionKeys):
-	 	#		print "Associated Ingredients: " + str(ingrSet & instructionKeys)
-	#			target.write("Associated Ingredients: " + str(ingredient & instructionKeys) + "\n")
+	 	target.write("Final Associations: " + str(finalAssociations) + "\n")
 		print "#####################################"
-	#	target.write("####################################" + "\n")
+		target.write("####################################" + "\n")
 target.close()
 
