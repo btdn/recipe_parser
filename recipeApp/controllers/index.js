@@ -1,14 +1,12 @@
-var express = require('express');
-var router = express.Router();
-
-/* GET home page. */
-router.get('/', function(req, res, next) {
+exports.index = function (req, res) {
   res.render('index', { title: 'home' });
-});
+};
+
+exports.demo = function (req, res) {
+  res.render('demo', { title: 'demo' });
+};
 
 /* GET demo page. */
-router.get('/demo', function(req, res, next) {
+/*exports.demo('/demo', function(req, res, next) {
   res.render('demo', { title: 'demo' });
-});
-
-module.exports = router;
+});*/

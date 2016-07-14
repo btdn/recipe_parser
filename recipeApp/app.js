@@ -4,21 +4,11 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var mysql = require("mysql");
 
 var controllers = require('./controllers/index');
-var users = require('./controllers/users');
-var recipes = require('./controllers/recipes');
+var recipe = require('./controllers/recipes');
 
 var app = express();
-
-// First you need to create a connection to the db
-var con = mysql.createConnection({
-  'user': 'root',
-  'password': 'root',
-  'host': 'localhost',
-  'database': 'mysql',
-});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -32,9 +22,12 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', controllers);
-app.use('/users', users);
-app.use('/recipes', recipes);
+//app.use('/', controllers);
+//app.use('/recipes', recipe);
+
+app.get('/', controllers.index)
+app.get('/demo', controllers.demo)
+app.get('/recipes', recipe.recipes)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -67,15 +60,8 @@ app.use(function(err, req, res, next) {
   });
 });
 
-//Establishing mysql connection
-con.connect(function(err){
-  if(err){
-    console.log('Error connecting to Db');
-    return;
-  }
-  console.log('Connection established');
-});
 
+//app.get('/recipes', recipe.recipes)
 
 
 module.exports = app;

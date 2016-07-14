@@ -254,31 +254,195 @@ finalAssociations = [
 
 {'#no-action#': [], 'cover': [], 'transfer': []},
 
+{'preheat': [], '#no-action#': []},
 
+{'#no-action#': [], 'place': [['water']]},
 
+{'score': [], '#no-action#': []},
 
+{'#no-action#': [], 'spritz':[['water']]},
 
+{'#no-action#': [], 'bake': []},
 
+{'#no-action#': [], 'spritz':[], 'rotate':[]},
 
+{'#no-action#': [], 'bake': []},
 
+{'#no-action#': [], 'cool': [], 'transfer':[]},
 
+{'#no-action#': []},
 
+{'pulse':[], 'cut': [['onion'], ['carrot'], ['celery']], '#no-action#': []},
 
+{'cook': [['smoked', 'sausage']], 'heat': [], '#no-action#': []},
 
+{'cook': [], 'add': [['onion'], ['carrot'], ['celery']], '#no-action#': []},
 
+{'cook': [], 'add': [['ketchup'], ['worcestershire', 'sauce'], ['brown', 'sugar']], '#no-action#': []},
 
+{'#no-action#': [], 'spoon': [['bun'], ['cheese']], 'serve': []},
 
+{'#no-action#': []},
 
+{'preheat': [], '#no-action#': []},
 
+{'#no-action#': []},
 
+{'#no-action#': [], 'toss': [['daikon'], ['carrot'], ['rice', 'vinegar']]},
 
+{'#no-action#': []},
 
+{'refrigerate': [], '#no-action#': [], 'set': [], 'drain': []},
 
+{'mix': [['mayonnaise'], ['hoisin', 'sauce'], ['sriracha']], '#no-action#': []},
 
+{'#no-action#': [], 'split': [['roll']], 'open': []},
 
+{'pull': [], '#no-action#': []},
 
+{'spread': [['roll']], '#no-action#': []},
 
+{'cut': [], '#no-action#': [], 'transfer': [['roll']]},
 
+{'#no-action#': [], 'bake': []},
+
+{'#no-action#': [], 'place': [['pork'], ['pate'], ['cucumber'], ['carrot'], ['jalapeno'], ['cilantro', 'leaf'], ['roll']]},
+
+ {'cut': [], '#no-action#': [], 'serve': []},
+
+ {'#no-action#': []},
+
+{'pulse':[], 'cut': [['onion'], ['carrot'], ['celery']], '#no-action#': []},
+
+{'cook': [['smoked', 'sausage'], ['brown']], 'heat': [], '#no-action#': []},
+
+{'cook': [], 'add': [['onion'], ['carrot'], ['celery']], '#no-action#': []},
+
+{'cook': [], 'add': [['ketchup'], ['worcestershire', 'sauce'], ['brown', 'sugar']], '#no-action#': []},
+
+{'#no-action#': [], 'spoon': [['bun'], ['cheese']], 'serve': []},
+
+{'#no-action#': []},
+
+{'preheat': [], '#no-action#': []},
+
+{'#no-action#': [], 'line':[]},
+
+{'#no-action#': [], 'toss': [['carrot'], ['rice', 'vinegar']]},
+
+{'#no-action#': []}, #ALERT
+
+{'refrigerate': [], '#no-action#': [], 'set': [], 'drain': []},
+
+{'mix': [['mayonnaise'], ['hoisin', 'sauce'], ['sriracha']], '#no-action#': []},
+
+{'#no-action#': [], 'split': [['roll']], 'open': []},
+
+{'pull': [], '#no-action#': []}, #ALERT
+
+{'spread': [['roll']], '#no-action#': []},
+
+{'cut': [], '#no-action#': [], 'transfer': [['roll']]},
+
+{'#no-action#': [], 'bake': []},
+
+{'#no-action#': [], 'place': [['pork'], ['pate'], ['cucumber'], ['carrot'], ['jalapeno'], ['cilantro', 'leaf'], ['roll']]},
+
+{'cut': [], '#no-action#': [], 'serve': []},
+
+{'#no-action#': []},
+
+{'preheat': [], '#no-action#': []},
+
+{'grill': [['red'], ['pepper']], '#no-action#': []},
+
+{'#no-action#': [], 'transfer':[]},
+
+{'#no-action#': [], 'place': [['tomato'], ['garlic']]},
+
+{'#no-action#': [], 'blend': [['pepper']]},
+
+{'season': [['oregano'], ['salt'], ['pepper']], '#no-action#': []},
+
+{'spread': [], '#no-action#': [], 'drizzle': [['olive', 'oil'], ['bread']], 'flip': []},
+
+{'add': [['mozzarella', 'cheese']], '#no-action#': [], 'place': [['bread']]},
+
+{'top': [['eggplant'], ['mozzarella', 'cheese']], '#no-action#': []},
+
+{'#no-action#': [], 'place': [['bread']]},
+
+{'grill': [['cheese']], '#no-action#': []},
+
+{'#no-action#': []},
+
+{'preheat': [], '#no-action#': []},
+
+{'grill': [['red'], ['pepper']], '#no-action#': []},
+
+{'transfer': [], '#no-action#': []},
+
+{'#no-action#': [], 'place': [['tomato'], ['garlic']]},
+
+{'#no-action#': [], 'blend': [['pepper']]},
+
+{'season': [['oregano'], ['salt'], ['pepper']], '#no-action#': []},
+
+{'grill': [['eggplant'], ['zucchini'], ['tomato'], ['onion']], '#no-action#': [], 'slice': []},
+
+{'spread': [], '#no-action#': [], 'drizzle': [['olive', 'oil'], ['bread']], 'flip': []},
+
+{'add': [['mozzarella', 'cheese']], '#no-action#': [], 'place': [['bread']]},
+
+{'top': [['eggplant'], ['mozzarella', 'cheese']], '#no-action#': []},
+
+{'#no-action#': [], 'place': [['bread']]},
+
+ {'grill': [['cheese']], '#no-action#': []},
+
+ {'#no-action#': []},
+
+ {'cook': [], '#no-action#': [], 'place': [['bacon']]},
+
+ {'#no-action#': [], 'drain': []},
+
+ {'#no-action#': [], 'set': [], 'crumble':[]},
+
+ {'heat': [], '#no-action#': [], 'spray': [['cooking']]},
+
+ {'#no-action#': [], 'crack': [['egg'], ['salt'], ['pepper']]},
+
+ {'#no-action#': [], 'cook': [['egg']]},
+
+ {'#no-action#': [], 'flip': [['egg']]},
+
+ {'sprinkle': [['bacon'], ['cheddar', 'cheese'], ['egg']], '#no-action#': []},
+
+ {'#no-action#': [], 'cook': ['cheese']]},
+
+ {'#no-action#': [], 'place': [['egg']]},
+
+ {'#no-action#': [], 'transfer':[]},
+
+ {'#no-action#': []},
+
+ {'cook': [], '#no-action#': [], 'place': [['bacon']]},
+
+ {'#no-action#': [], 'drain': []},
+
+ {'#no-action#': [], 'set': [], 'crumble': []},
+
+ {'heat': [], '#no-action#': [], 'spray': [['cooking'], ['spray']]},
+
+ {'#no-action#': [], 'crack': [['egg'], ['salt'], ['pepper']]},
+
+ {'#no-action#': [], 'cook': [['egg']]},
+
+ {'#no-action#': [], 'flip': [['egg']]},
+
+ {'sprinkle': [['bacon'], ['cheddar', 'cheese'], ['egg']], '#no-action#': []},
+
+ 
 
 
 
