@@ -28,6 +28,8 @@ compoundIngredientDict = pickle.load( open( "save_compound_ingredients.p", "rb" 
 ingredientSet = Set(pickle.load( open( "save_ingredient_list.p", "rb" ) ) )
 cookingVerbSet = Set(pickle.load( open( "save_cooking_verb.p", "rb" ) ) )
 groundTruth = pickle.load( open( "ground_truth.p", "rb" ) ) 
+hesitateVerbs = pickle.load( open( "save_hesitate_verbs.p", "rb" ) ) 
+cookingVerbDict = dict.fromkeys(cookingVerbSet, 0)
 
 #print "Opening the file..."
 #target = open('output-jul-8-2016.txt', 'w')
@@ -48,7 +50,7 @@ def extractIngredientKeysPruning(ingredient):
 				ingredientsCopy.remove(wordChunk)
 	return ingredientsCopy
 
-def cleanRawString(wordChunk):
+def cleanRawString(wordChunk, verbFlag):
 	wordChunk = wordChunk.replace("'", "")
 	wordChunk = wordChunk.replace(",", "")
 	wordChunk = wordChunk.replace("[", "")
@@ -58,7 +60,7 @@ def cleanRawString(wordChunk):
 	wordChunk = wordChunk.replace(')', '')	
 	wordChunk = wordChunk.strip()
 	wordChunk = wordChunk.lower()
-	if p.singular_noun(wordChunk):
+	if not verbFlag and p.singular_noun(wordChunk):
 		wordChunk = p.singular_noun(wordChunk)
 	return wordChunk	
 
@@ -67,7 +69,7 @@ def extractIngredientKeys(ingredient):
 	ingredient = [str(x) for x in ingredient]
 	compoundKeys = Set([])
 	for x in range(len(ingredient)):
-		ingredient[x] = cleanRawString(ingredient[x])
+		ingredient[x] = cleanRawString(ingredient[x], None)
 		elem = ingredient[x]
 		if elem in compoundIngredientDict:
 			extraKeys = compoundIngredientDict[elem]
@@ -87,7 +89,7 @@ def extractIngredientKeys(ingredient):
 		return compoundKeys
 
 def extractInstructionKeys(instruction):
-	splitInstruction = [cleanRawString(str(x.encode('ascii','ignore'))) for x in instruction.split()]
+	splitInstruction = [cleanRawString(str(x.encode('ascii','ignore')), True) for x in instruction.split()]
 	return splitInstruction
 
 def extractInstructionLabel(instruction, labels):
@@ -96,7 +98,9 @@ def extractInstructionLabel(instruction, labels):
 	assured = []
 	for wordChunk in instruction:
 		if wordChunk.upper() in cookingVerbSet:
-			if wordChunk in labels:
+			if wordChunk in labels or wordChunk.upper() not in hesitateVerbs:
+				print wordChunk
+				cookingVerbDict[wordChunk.upper()] += 1
 				assured.append(wordChunk)
 			else:
 				backup.append(wordChunk)
@@ -111,12 +115,13 @@ def print_fine_pos(token):
     return (token.tag_)
 
 def pos_tags(sentence):
-    tokens = nlp(sentence)
-    tags = []
-    for tok in tokens:
-    	if 'V' in str(print_fine_pos(tok)):
-        	tags.append(cleanRawString(str(tok)))
-    return Set(tags)
+	tokens = nlp(sentence)
+	tags = []
+	for tok in tokens:
+		print (tok ,str(print_fine_pos(tok)) )
+		if 'V' in str(print_fine_pos(tok)):
+			tags.append(cleanRawString(str(tok), None))
+	return Set(tags)
 
 #set of tuples of used ingredients + the new ingredient
 
@@ -124,6 +129,7 @@ query = ("SELECT name, type, ingredients, recipe_instructions FROM cooking_recip
 cursor.execute(query)
 results = cursor.fetchall()
 finalAssociationsCounter = 0
+matches = 0
 
 for name, type, rawIngr, rawInstr in results:
 	ingredients = []
@@ -165,6 +171,7 @@ for name, type, rawIngr, rawInstr in results:
 		#step_id = cursor.fetchone()[0]
 
 		instructionKeys = extractInstructionKeys(instruction)
+		print instructionKeys
 		finalLabel = extractInstructionLabel(instructionKeys, labels)
 		#target.write("Ingredients: " + str(ingredients) + "\n")
 		compoundFlag = False
@@ -213,15 +220,21 @@ for name, type, rawIngr, rawInstr in results:
 	 			finalAssociations[currAction].append(associatedIngredient)
 
 	 	print "Final Associations: ", finalAssociations
+	 	if finalAssociationsCounter >= len(groundTruth):
+	 		print float(matches)/finalAssociationsCounter
+	 		print cookingVerbDict
+	 		#return
 	 	print groundTruth[finalAssociationsCounter]
 	 	if Set(groundTruth[finalAssociationsCounter]) == Set(finalAssociations):
 	 		print "match"
+	 		matches += 1
 	 	else:
 	 		print "mismatch"
 	 	print finalAssociationsCounter
 	 	finalAssociationsCounter += 1
 	 	#target.write("Final Associations: " + str(finalAssociations) + "\n")
 		print "#####################################"
+
 		#target.write("####################################" + "\n")
 #target.close()
 

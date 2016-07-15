@@ -30,7 +30,7 @@ exports.recipes = function (req, res) {
 	    	console.log(row.recipe_name)
 	    	recipes[row.recipe_name] = {}
 	    	console.log('SELECT * FROM ingredients WHERE recipe_id=' + row.id);
-	    	con.query('SELECT * FROM ingredients WHERE recipe_id=' + row.id ,function(errI,rowsI){
+	    	con.query('SELECT * FROM ingredients WHERE recipe_id=' + row.id ,function(errI,rowsI) {
 	      		if(errI) throw errI;
 	      		if (rowsI.length == 0) return;
 	      		recipes[row.recipe_name]['ingredients'] = rowsI

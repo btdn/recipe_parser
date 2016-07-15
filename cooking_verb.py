@@ -35,6 +35,7 @@ cookingVerbs = {
 'CORRECT',
 'COVER',
 'CRUMPLE',
+'CRUMBLE',
 'CUT',
 'DECORATE',
 'DEBONE',
