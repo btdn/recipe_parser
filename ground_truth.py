@@ -47,6 +47,8 @@ finalAssociations = [
 
 {'#no-action#': [], 'overlap':[['banana']]},
 
+{'#no-action#': [], 'place': [['bread']]},
+
 {'#no-action#': [], 'dip': [['egg']]},
 
 {'heat': [['skillet']], 'spray': [['cooking', 'spray']], '#no-action#': []},
@@ -98,6 +100,8 @@ finalAssociations = [
 {'#no-action#': [], 'reduce': [['custard']]},
 
 {'#no-action#': [], 'place': [['bread']]},
+
+{'spread': [['custard']], '#no-action#': []},
 
 {'#no-action#': [], 'cover':[], 'form': []},
 
@@ -184,6 +188,8 @@ finalAssociations = [
 {'#no-action#': [], 'cover': []},
 
 {'#no-action#': [], 'flatten':[]},
+
+{'#no-action#': [], 'roll': [], 'form': []},
 
 {'transfer':[], '#no-action#': [], 'cover': []},
 
@@ -365,6 +371,8 @@ finalAssociations = [
 
 {'season': [['oregano'], ['salt'], ['pepper']], '#no-action#': []},
 
+{'grill': [['eggplant'], ['zucchini'], ['tomato'], ['onion']], '#no-action#': []},
+
 {'spread': [], '#no-action#': [], 'drizzle': [['olive', 'oil'], ['bread']], 'flip': []},
 
 {'add': [['mozzarella', 'cheese']], '#no-action#': [], 'place': [['bread']]},
@@ -442,6 +450,8 @@ finalAssociations = [
  {'#no-action#': [], 'flip': [['egg']]},
 
  {'sprinkle': [['bacon'], ['cheddar', 'cheese'], ['egg']], '#no-action#': []},
+
+ {'#no-action#': [], 'cook': [['cheese']]},
 
  {'#no-action#': [], 'place': [['egg']]},
 
