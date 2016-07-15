@@ -1,4 +1,5 @@
 #Ground Truth
+import pickle
 
 finalAssociations = [ 
 
@@ -34,7 +35,7 @@ finalAssociations = [
 
 {'transfer': [], 'turn': [], '#no-action#': []},
 
-{'spread': [['cranberry', 'sauce'], 'top': [['turkey'], ['provolone', 'cheese'], ['bacon']], '#no-action#': []},
+{'spread': [['cranberry', 'sauce']], 'top': [['turkey'], ['provolone', 'cheese'], ['bacon']], '#no-action#': []},
 
 {'spread': [['mustard']], '#no-action#': [], 'lay': [['bacon']]},
 
@@ -72,7 +73,7 @@ finalAssociations = [
 
 {'transfer': [], 'turn':[], '#no-action#': []},
 
-{'spread': [['cranberry', 'sauce'], 'top': [['turkey'], ['provolone', 'cheese'], ['bacon']], '#no-action#': []},
+{'spread': [['cranberry', 'sauce']], 'top': [['turkey'], ['provolone', 'cheese'], ['bacon']], '#no-action#': []},
 
 {'spread': [['mustard']], '#no-action#': [], 'lay': [['bacon']]},
 
@@ -418,7 +419,7 @@ finalAssociations = [
 
  {'sprinkle': [['bacon'], ['cheddar', 'cheese'], ['egg']], '#no-action#': []},
 
- {'#no-action#': [], 'cook': ['cheese']]},
+ {'#no-action#': [], 'cook': [['cheese']]},
 
  {'#no-action#': [], 'place': [['egg']]},
 
@@ -442,8 +443,48 @@ finalAssociations = [
 
  {'sprinkle': [['bacon'], ['cheddar', 'cheese'], ['egg']], '#no-action#': []},
 
- 
+ {'#no-action#': [], 'place': [['egg']]},
 
+ {'transfer': [], '#no-action#': []},
 
+ {'#no-action#': []},
+
+{'#no-action#': [], 'roast': [['pork']]},
+
+{'#no-action#': [], 'slice': ['pork']}, #ALERT
+
+{'#no-action#': [], 'heat': [['sandwich']]},
+
+{'#no-action#': [], 'stir': [['mayonnaise'], ['caper'], ['lemon', 'pepper']]},
+
+{'#no-action#': [], 'brush': [['bread'], ['olive', 'oil']]},
+
+{'spread': [['bread'], ['mayonnaise']], '#no-action#': []},
+
+{'layer': [['arugula'], ['pork'], ['havarti']], '#no-action#': [['sandwich']], 'top': [['mayonnaise']]},
+
+{'top': [['bread']], '#no-action#': []},
+
+{'#no-action#': [['olive', 'oil']]},
+
+{'#no-action#': [], 'place': [['sandwich']]},
+
+{'cook': [['bread'], ['cheese']], '#no-action#': []},
+
+{'cut': [], '#no-action#': [], 'serve': []},
+
+{'#no-action#': []},
+
+{'#no-action#': [], 'roast': [['pork']]},
+
+{'#no-action#': [], 'slice': []},
+
+{'heat': [], '#no-action#': []},
+
+{'#no-action#': [], 'stir': [['mayonnaise'], ['caper'], ['lemon', 'pepper']]},
+
+{'#no-action#': [], 'brush': [['bread'], ['olive', 'oil']]},
 
 ]
+
+pickle.dump(finalAssociations, open( "ground_truth.p", "wb" ) )
