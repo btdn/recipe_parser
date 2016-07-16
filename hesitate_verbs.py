@@ -8,6 +8,7 @@ verb_nouns = {
 'STEAM',
 'PICKLE',
 'CHECK',
+'HEAT',
 'SLICE',
 'GLAZE',
 'DUST',

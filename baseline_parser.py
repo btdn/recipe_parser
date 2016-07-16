@@ -70,6 +70,7 @@ def extractIngredientKeys(ingredient):
 	compoundKeys = Set([])
 	for x in range(len(ingredient)):
 		ingredient[x] = cleanRawString(ingredient[x], None)
+		print ingredient[x]
 		elem = ingredient[x]
 		if elem in compoundIngredientDict:
 			extraKeys = compoundIngredientDict[elem]
@@ -80,9 +81,11 @@ def extractIngredientKeys(ingredient):
 			else:
 				compoundKeys.add(elem)
 				flag = False
-		if elem in ingredientSet:
+			break
+		elif elem in ingredientSet:
 			compoundKeys.add(elem)
 			flag = False
+			break
 	if flag:
 		return extractIngredientKeysPruning(ingredient)
 	else:
@@ -96,9 +99,10 @@ def extractInstructionLabel(instruction, labels):
 	flag = True
 	backup = []
 	assured = []
-	for wordChunk in instruction:
+	for x in range(len(instruction)):
+		wordChunk = instruction[x]
 		if wordChunk.upper() in cookingVerbSet:
-			if wordChunk in labels or wordChunk.upper() not in hesitateVerbs:
+			if x is 0 or wordChunk in labels or wordChunk.upper() not in hesitateVerbs:
 				print wordChunk
 				cookingVerbDict[wordChunk.upper()] += 1
 				assured.append(wordChunk)
@@ -226,7 +230,7 @@ for name, type, rawIngr, rawInstr in results:
 	 		#return
 	 	print groundTruth[finalAssociationsCounter]
 	 	if Set(groundTruth[finalAssociationsCounter]) == Set(finalAssociations):
-	 		print "match"
+	 	#	print "match"
 	 		matches += 1
 	 	else:
 	 		print "mismatch"
