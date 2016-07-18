@@ -443,7 +443,7 @@ finalAssociations = [
 
  {'heat': [], '#no-action#': [], 'spray': [['cooking'], ['spray']]},
 
- {'#no-action#': [], 'crack': [['egg'], ['salt'], ['pepper']]},
+{'season': [['salt']], '#no-action#': [], 'crack': [['egg']]},
 
  {'#no-action#': [], 'cook': [['egg']]},
 
@@ -471,7 +471,7 @@ finalAssociations = [
 
 {'spread': [['bread'], ['mayonnaise']], '#no-action#': []},
 
-{'layer': [['arugula'], ['pork'], ['havarti']], '#no-action#': [['sandwich']], 'top': [['mayonnaise']]},
+ {'layer': [['arugula'], ['havarti'], ['mayonnaise']], '#no-action#': []},
 
 {'top': [['bread']], '#no-action#': []},
 

@@ -70,7 +70,6 @@ def extractIngredientKeys(ingredient):
 	compoundKeys = Set([])
 	for x in range(len(ingredient)):
 		ingredient[x] = cleanRawString(ingredient[x], None)
-		print ingredient[x]
 		elem = ingredient[x]
 		if elem in compoundIngredientDict:
 			extraKeys = compoundIngredientDict[elem]
@@ -203,6 +202,8 @@ for name, type, rawIngr, rawInstr in results:
 	 			finalAssociations[wordChunk] = []
 	 			currAction = wordChunk
 	 		for y in range(len(ingredients)):
+	 			if p.singular_noun(wordChunk):
+					wordChunk = p.singular_noun(wordChunk)
 	 			ingredient = ingredients[y]
 	 			ingrSet = Set(ingredient)
 	 			if wordChunk in ingrSet and not usedIngredients[y]:
@@ -215,14 +216,14 @@ for name, type, rawIngr, rawInstr in results:
 	 				break
 
 	 		if (len(associatedIngredient) > 0):
-	 		# 	print "Associated Ingredients: " + str(associatedIngredient)
+	 		 	print "Associated Ingredients: " + str(associatedIngredient)
 	 		# 	query = ("INSERT INTO node(recipe_id, step_id, class, rank, text) VALUES(%s, %s, %s, %s, %s)")
 				# cursor.execute(query, (recipe_id, step_id, 'ingredient', rank, ' '.join(associatedIngredient)))
 				# link.commit()
 				rank += 1
 	 			#target.write("Associated Ingredients: " + str(associatedIngredient) + "\n")
 	 			finalAssociations[currAction].append(associatedIngredient)
-
+	 	print ingredients
 	 	print "Final Associations: ", finalAssociations
 	 	if finalAssociationsCounter >= len(groundTruth):
 	 		print float(matches)/finalAssociationsCounter
