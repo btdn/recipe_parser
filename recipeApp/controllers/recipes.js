@@ -69,13 +69,19 @@ function getInstruction(recipe, ingredients) {
     			var node = nodes[j];
     			if(node.class === 'action') {
     				instruction.push({'text': text_line, 'keyword': node.text, 'associatedIngr': []});
-    				var lastInsert = instruction.length-1;
+    				var lastInsert = instruction.length-1;	
+    				if(instruction.length > 1) {
+    					instruction[instruction.length-1]['associatedIngr'].push(ingredients.length+1);
+    				}
     			} else {
     				if (lastInsert != -1) {
     					instruction[lastInsert]['associatedIngr'].push(findAssocIngr(ingredients, node.text));
     				} else {
     					var lastInsert = 0;
     					instruction.push({'text': text_line, 'keyword': node.text, 'associatedIngr': [findAssocIngr(ingredients, node.text)]});
+    					if(instruction.length > 1) {
+    						instruction[instruction.length-1]['associatedIngr'].push(ingredients.length+1);
+    					}	
     				}
     			}
     		}
@@ -125,7 +131,6 @@ exports.recipes = function (req, res) {
 	        			//	newInstruction = getNewInstruction(recipes[recipe_id][step_id], newIngredient)
 	        			//	console.log(newInstruction) 
 	        				return;
-	        				//console.log(recipes); */
 	        			} else {	        			
 	          				rowS = rowsS[i]
 	          				console.log("We're on step " + i + " recipe_id " + recipe_id + "whose text is " + rowS.text_line)
