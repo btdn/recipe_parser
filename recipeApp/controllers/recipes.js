@@ -20,9 +20,18 @@ con.connect(function(err){
 
 function findAssocIngr(ingredients, matchIngredient) {
 	for(i = 0; i<ingredients.length;i++) {
-		if(ingredients[i].name === matchIngredient) {
-			return i
+		var matchKeys = matchIngredient.split(" ");
+		var currKeys = ingredients[i].name.split(" ");
+		for(j=0;j<matchKeys.length;j++) {
+			for(k=0;k<currKeys.length;k++) {
+				if(matchKeys[j] === currKeys[k]) {
+					return i;
+				}
+			}
 		}
+	//	if(ingredients[i].name === matchIngredient) {
+	//		return i
+	//	}
 	}
 	return -1;
 }
@@ -47,7 +56,7 @@ function getNewInstruction(recipe, ingredients) {
 	return newInstructions
 }
 
-function getInstruction(recipe) {
+function getInstruction(recipe, ingredients) {
 	var instruction = [];
 	for (var key in recipe) {
   		if (recipe.hasOwnProperty(key)) {
@@ -63,10 +72,10 @@ function getInstruction(recipe) {
     				var lastInsert = instruction.length-1;
     			} else {
     				if (lastInsert != -1) {
-    					instruction[lastInsert]['associatedIngr'].push(node.text);
+    					instruction[lastInsert]['associatedIngr'].push(findAssocIngr(ingredients, node.text));
     				} else {
     					var lastInsert = 0;
-    					instruction.push({'text': text_line, 'keyword': node.text, 'associatedIngr': [node.text]});
+    					instruction.push({'text': text_line, 'keyword': node.text, 'associatedIngr': [findAssocIngr(ingredients, node.text)]});
     				}
     			}
     		}
@@ -112,7 +121,7 @@ exports.recipes = function (req, res) {
 	        					console.log(ingredient)
 	        					newIngredient.push({'name':ingredient.text_name, 'amount': 1, 'metric': 'cup'});
 	        				}
-	        				getInstruction(recipes[recipe_id]);
+	        				getInstruction(recipes[recipe_id], newIngredient);
 	        			//	newInstruction = getNewInstruction(recipes[recipe_id][step_id], newIngredient)
 	        			//	console.log(newInstruction) 
 	        				return;
