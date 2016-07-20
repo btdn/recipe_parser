@@ -28,6 +28,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', controllers.index)
 app.get('/demo', controllers.demo)
 app.get('/recipes', recipe.recipes)
+app.get('/get_recipes', recipe.get_recipes)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

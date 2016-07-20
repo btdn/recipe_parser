@@ -17,6 +17,7 @@ con.connect(function(err){
   console.log('Connection established');
 });
 
+var recipe_data = [];
 
 function findAssocIngr(ingredients, matchIngredient) {
 	for(i = 0; i<ingredients.length;i++) {
@@ -29,9 +30,6 @@ function findAssocIngr(ingredients, matchIngredient) {
 				}
 			}
 		}
-	//	if(ingredients[i].name === matchIngredient) {
-	//		return i
-	//	}
 	}
 	return -1;
 }
@@ -87,14 +85,16 @@ function getInstruction(recipe, ingredients) {
     		}
   		}
 	}
-	console.log("FINAL INSTRUCTIOn");
-	console.log(instruction);
+	return instruction;
+}
+
+exports.get_recipes = function (req, res) {
+	res.send(JSON.stringify(recipe_data)); 
 }
 
 /* GET users listing. */
 exports.recipes = function (req, res) {
   //Drawing information from the database for later parsing
-//FOR LATER: con.query should be inside other calls 
 	recipes = {}
 	con.query('SELECT * FROM recipes LIMIT 10',function(err,rows){
   		if(err) throw err;
@@ -106,7 +106,6 @@ exports.recipes = function (req, res) {
 	      		if (rowsI.length == 0) return;
 	      		var recipe_id = rowsI[0].recipe_id
 	      		recipes[recipe_id]['ingredients'] = rowsI
-	      		//recipes[recipe_id]['actions'] = []
 	      		recipes[recipe_id]['text'] = ""
 	      		con.query('SELECT * FROM steps WHERE recipe_id=' + rowsI[0].recipe_id, function(errS,rowsS) 	{
 	        		if(errS) throw errS;
@@ -116,10 +115,7 @@ exports.recipes = function (req, res) {
 	        		console.log("STEPS: " + rowsS)
 	        		//put this into an ingredient array
 	        		function recursiveSteps(i, recipe_id, step_id, rowsS) {
-	        		//	for (i = 0; i < rowsS.length; i++) {
 	        			if (i < 0) {
-	        				console.log(i)
-	        				console.log("INGREDIENTS: " );
 	        				var newIngredient = []
 	        				var newInstruction = []
 	        				for(j=0;j<recipes[recipe_id]['ingredients'].length;j++) {
@@ -127,15 +123,12 @@ exports.recipes = function (req, res) {
 	        					console.log(ingredient)
 	        					newIngredient.push({'name':ingredient.text_name, 'amount': 1, 'metric': 'cup'});
 	        				}
-	        				getInstruction(recipes[recipe_id], newIngredient);
-	        			//	newInstruction = getNewInstruction(recipes[recipe_id][step_id], newIngredient)
-	        			//	console.log(newInstruction) 
-	        				return;
+	        				var newInstruction = getInstruction(recipes[recipe_id], newIngredient);
+	        				recipe_data.push([newInstruction, newIngredient]);
 	        			} else {	        			
 	          				rowS = rowsS[i]
 	          				console.log("We're on step " + i + " recipe_id " + recipe_id + "whose text is " + rowS.text_line)
 	          				recipes[recipe_id][rowS.id] = {}
-	          		//		console.log("Recursion at level: " + i + " with recipe_id " + recipe_id)
 	          				recipes[recipe_id][rowS.id]['text_line'] = rowS.text_line;
 	          				con.query('SELECT * FROM node WHERE step_id="' + rowS.id + '"', function(errN,rowsN){
 	           					if(rowsN.length > 0)  {
@@ -146,16 +139,16 @@ exports.recipes = function (req, res) {
 		           					console.log("NODES of step_id "+step_id+": " + rowsN); 
 		           					recipes[recipe_id][step_id]['nodes'] = rowsN;
 	           					}
-	           					recursiveSteps(i - 1, recipe_id, step_id, rowsS);
+	           					var newInstruction = recursiveSteps(i - 1, recipe_id, step_id, rowsS);
+	           					return newInstruction;
 	          				}); 
 	          			}
-	    			//	}
 	        		}
-	        		recursiveSteps(rowsS.length-1, recipe_id, -1, rowsS); 
+	        		console.log(recursiveSteps(rowsS.length-1, recipe_id, -1, rowsS) ); 
 
 	    		}); 
 	    	});
   		}
 	});
-	res.send('respond with a resource');
+	res.send("STARTED IT UP YO");
 };
