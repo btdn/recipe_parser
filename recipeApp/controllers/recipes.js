@@ -17,7 +17,8 @@ con.connect(function(err){
   console.log('Connection established');
 });
 
-var recipe_data = [];
+var recipe_data = {'percent_complete': 0.0, 'data': []};
+var num_recipes = 0;
 
 function findAssocIngr(ingredients, matchIngredient) {
 	for(i = 0; i<ingredients.length;i++) {
@@ -89,6 +90,8 @@ function getInstruction(recipe, ingredients) {
 }
 
 exports.get_recipes = function (req, res) {
+	recipe_data['percent_complete'] = recipe_data['data'].length/num_recipes;
+	console.log(recipe_data);
 	res.send(JSON.stringify(recipe_data)); 
 }
 
@@ -100,6 +103,7 @@ exports.recipes = function (req, res) {
   		if(err) throw err;
   		for (i = 0; i < rows.length; i++) {
     		row = rows[i];
+    		num_recipes = rows.length;
 	    	recipes[row.id] = {}
 	    	con.query('SELECT * FROM ingredients WHERE recipe_id=' + row.id ,function(errI,rowsI) {
 	      		if(errI) throw errI;
@@ -124,7 +128,7 @@ exports.recipes = function (req, res) {
 	        					newIngredient.push({'name':ingredient.text_name, 'amount': 1, 'metric': 'cup'});
 	        				}
 	        				var newInstruction = getInstruction(recipes[recipe_id], newIngredient);
-	        				recipe_data.push([newInstruction, newIngredient]);
+	        				recipe_data['data'].push([newInstruction, newIngredient]);
 	        			} else {	        			
 	          				rowS = rowsS[i]
 	          				console.log("We're on step " + i + " recipe_id " + recipe_id + "whose text is " + rowS.text_line)

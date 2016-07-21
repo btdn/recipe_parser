@@ -20,6 +20,8 @@ config = {
   'raise_on_warnings': True,
 }
 
+mismatchList = []; 
+
 link = mysql.connector.connect(**config)
 cursor = link.cursor()
 cookingDescriptions = {'cut', 'small', 'medium', 'sliced', 'large', 'very', 'more', 'squeezed', 'freshly', 'chopped', 'peeled', 'cored', 'ground', 'finely'}
@@ -31,9 +33,9 @@ groundTruth = pickle.load( open( "ground_truth.p", "rb" ) )
 hesitateVerbs = pickle.load( open( "save_hesitate_verbs.p", "rb" ) ) 
 cookingVerbDict = dict.fromkeys(cookingVerbSet, 0)
 
-#print "Opening the file..."
-#target = open('output-jul-8-2016.txt', 'w')
-#target.truncate()
+print "Opening the file..."
+target = open('output-cookie.txt', 'w')
+target.truncate()
 
 def extractIngredientKeysPruning(ingredient):
 	ingredientsCopy = deepcopy(ingredient)
@@ -128,7 +130,8 @@ def pos_tags(sentence):
 
 #set of tuples of used ingredients + the new ingredient
 
-query = ("SELECT name, type, ingredients, recipe_instructions FROM cooking_recipes_reformat WHERE type='sandwich'") 
+query = ("SELECT name, type, ingredients, recipe_instructions FROM cooking_recipes_reformat WHERE type='sandwich'")
+#query = 'SELECT name, type, ingredients, recipe_instructions FROM cooking_recipes_reformat WHERE type="cookie" AND name LIKE "%chocolate chip%"'; 
 cursor.execute(query)
 results = cursor.fetchall()
 finalAssociationsCounter = 0
@@ -152,6 +155,7 @@ for name, type, rawIngr, rawInstr in results:
 	
 	for x in ingrArr:
 		#INSERT INTO TABLE: ingredients
+		print x
 		ingredient = extractIngredientKeys(x.split())
 		# query = ("INSERT INTO ingredients(recipe_id, text_name) VALUES(%s, %s)")
 		# cursor.execute(query, (recipe_id, ' '.join(ingredient)))
@@ -164,7 +168,7 @@ for name, type, rawIngr, rawInstr in results:
 		print instruction
 		labels = pos_tags(instruction)
 		instruction = unicodedata.normalize('NFKD', instruction).encode('ascii','ignore')
-		#target.write(instruction + "\n")
+	#	target.write(instruction + "\n")
 		#INSERT INTO TABLE: steps
 		# query = ("INSERT INTO steps(recipe_id, text_line) VALUES(%s, %s)")
 		# cursor.execute(query, (recipe_id, instruction))
@@ -176,10 +180,10 @@ for name, type, rawIngr, rawInstr in results:
 		instructionKeys = extractInstructionKeys(instruction)
 		print instructionKeys
 		finalLabel = extractInstructionLabel(instructionKeys, labels)
-		#target.write("Ingredients: " + str(ingredients) + "\n")
+	#	target.write("Ingredients: " + str(ingredients) + "\n")
 		compoundFlag = False
 		
-		#target.write(str(finalLabel) + "\n")
+	#	target.write(str(finalLabel) + "\n")
 		usedIngredients = [0] * len(ingredients)
 		finalAssociations = {}
 	 	currIndex = 0
@@ -221,25 +225,27 @@ for name, type, rawIngr, rawInstr in results:
 				# cursor.execute(query, (recipe_id, step_id, 'ingredient', rank, ' '.join(associatedIngredient)))
 				# link.commit()
 				rank += 1
-	 			#target.write("Associated Ingredients: " + str(associatedIngredient) + "\n")
+	 		#	target.write("Associated Ingredients: " + str(associatedIngredient) + "\n")
 	 			finalAssociations[currAction].append(associatedIngredient)
 	 	print ingredients
 	 	print "Final Associations: ", finalAssociations
 	 	if finalAssociationsCounter >= len(groundTruth):
 	 		print float(matches)/finalAssociationsCounter
 	 		print cookingVerbDict
+	 		print mismatchList
 	 		#return
 	 	print groundTruth[finalAssociationsCounter]
 	 	if Set(groundTruth[finalAssociationsCounter]) == Set(finalAssociations):
-	 	#	print "match"
+	 		print "match"
 	 		matches += 1
 	 	else:
 	 		print "mismatch"
+			mismatchList.append(finalAssociationsCounter)
 	 	print finalAssociationsCounter
 	 	finalAssociationsCounter += 1
-	 	#target.write("Final Associations: " + str(finalAssociations) + "\n")
+	 #	target.write("Final Associations: " + str(finalAssociations) + "\n")
 		print "#####################################"
 
-		#target.write("####################################" + "\n")
-#target.close()
+	#	target.write("####################################" + "\n")
+target.close()
 

@@ -1,0 +1,548 @@
+<!doctype html>
+
+<meta charset="utf-8">
+<title>Recipe Demo</title>
+
+<link rel="stylesheet" href="./stylesheets/demo.css">
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="/javascripts/dagre-d3.js"></script>
+
+<!-- Pull in JQuery dependencies -->
+<link rel="stylesheet" href="/stylesheets/tipsy.css">
+<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+<script src="/javascripts/tipsy.js"></script>
+
+<h1>Recipe Demo</h1>
+
+<style id="css">
+text {
+  font-weight: 300;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serf;
+  font-size: 14px;
+}
+
+.node rect {
+  stroke: #333;
+  fill: #fff;
+}
+
+.edgePath path {
+  stroke: #333;
+  fill: #333;
+  stroke-width: 1.5px;
+}
+
+.node text {
+  pointer-events: none;
+}
+
+/* This styles the title of the tooltip */
+.tipsy .name {
+  font-size: 1.5em;
+  font-weight: bold;
+  color: #60b1fc;
+  margin: 0;
+}
+
+/* This styles the body of the tooltip */
+.tipsy .description {
+  font-size: 1.2em;
+}
+</style>
+
+<svg id="first" width=950 height=600></svg>
+<svg id="second" width=950 height=600></svg>
+<svg id="third" width=950 height=600></svg>
+
+<section>
+<p>The TCP state diagram
+(<a href="http://www.rfc-editor.org/rfc/rfc793.txt">source: RFC 793</a>) with
+hover support. Uses <a href="http://bl.ocks.org/ilyabo/1373263">tipsy JS and CSS</a>
+for the tooltip.
+</section>
+
+<script id="js">
+// Create a new directed graph
+var g = new dagreD3.graphlib.Graph().setGraph({});
+
+//Create a second directed graph
+var g1 = new dagreD3.graphlib.Graph().setGraph({});
+
+//Create a common edges and states graph
+var g2 = new dagreD3.graphlib.Graph().setGraph({});
+
+// States and transitions from RFC 793
+var ingredients = [
+  {
+  'name': 'white sugar',
+  'amount': 1.5,
+  'amountMetric': 'cup',
+  },
+  {
+  'name': 'all-purpose flour',
+  'amount': 4,
+  'amountMetric': 'cup'
+  }, 
+  {
+  'name': 'baking powder',
+  'amount': 1,
+  'amountMetric': 'teaspoon'
+  }, 
+  {
+  'name': 'baking soda',
+  'amount': 0.5,
+  'amountMetric': 'teaspoon',
+  }, 
+  {
+  'name': 'salt',
+  'amount': 0.5,
+  'amountMetric': 'teaspoon',
+  },
+  {
+  'name': 'ground nutmeg',
+  'amount': 0.75,
+  'amountMetric': 'teaspoon',
+  },
+  {
+  'name': 'vanilla extract',
+  'amount': 1,
+  'amountMetric': 'teaspoon',
+  },  
+];
+
+var instructions = [
+  {
+  'text': 'Combine the flour with the baking powder, baking soda, salt and nutmeg.',
+  'associatedIngr': [0, 1, 2, 3, 4, 5],
+  'keyword': 'combine'
+  },
+  {
+  'text': 'In a clean 1 liter sized glass jar with a wide mouth layer the white sugar followed by the flour mixture.',
+  'associatedIngr': [7],
+  'keyword': 'layer'
+  },
+  {
+  'text': 'Press firmly in place and seal.',
+  'associatedIngr': [8],
+  'keyword': 'press'
+  },
+  {
+  'text': 'Attach a card with the following instructions: In a large bowl: beat 1 egg with 1 cup softened butter or margarine until light and fluffy.',
+  'associatedIngr': [9],
+  'keyword': 'attach'
+  },
+  {
+  'text': 'At low speed of an electric mixer add 1/2 cup sour cream, 1 teaspoon vanilla and contents of Jar.',
+  'associatedIngr': [6, 10],
+  'keyword': 'electric mix'
+  },
+  {
+  'text': 'Mix until combined.',
+  'associatedIngr': [11],
+  'keyword': 'mix'
+  },
+  {
+  'text': 'Using hands if necessary.',
+  'associatedIngr': [12],
+  'keyword': 'misc'
+  },
+  {
+  'text': 'Remove dough from the refrigerator.',
+  'associatedIngr': [13],
+  'keyword': 'refrigerate'
+  },
+  {
+  'text': 'Preheat oven to 375 degrees F (190 degrees C).',
+  'associatedIngr': [14],
+  'keyword': 'preheat'
+  },
+  {
+  'text': 'Roll chilled dough out on a lightly floured surface to 1/8 inch thick.',
+  'associatedIngr': [15],
+  'keyword': 'roll'
+  },
+  {
+  'text': 'Cut dough into desired shapes.',
+  'associatedIngr': [16],
+  'keyword': 'cut'
+  },
+  {
+  'text': 'Place on an ungreased cookie sheet and bake at 375 degrees F (190 degrees C)',
+  'associatedIngr': [17],
+  'keyword': 'bake'
+  },
+];
+
+var ingredients2 = [
+  {
+  'name': 'white sugar',
+  'amount': 0.5,
+  'amountMetric': 'cup',
+  },
+  {
+  'name': 'all-purpose flour',
+  'amount': 1.5,
+  'amountMetric': 'cup'
+  }, 
+  {
+  'name': 'butter',
+  'amount': 0.5,
+  'amountMetric': 'cup'
+  }, 
+  {
+  'name': 'baking soda',
+  'amount': 1,
+  'amountMetric': 'teaspoon',
+  }, 
+  {
+  'name': 'brown sugar',
+  'amount': 1,
+  'amountMetric': 'cup',
+  },
+  {
+  'name': 'ground cinnamon',
+  'amount': 1.0,
+  'amountMetric': 'teaspoon',
+  },
+  {
+  'name': 'vanilla extract',
+  'amount': 1,
+  'amountMetric': 'teaspoon',
+  },
+  {
+  'name': 'eggs',
+  'amount': 2,
+  'amountMetric': 'eggs',
+  },    
+  {
+  'name': 'ground cloves',
+  'amount': 0.5,
+  'amountMetric': 'teaspoon',
+  },  
+  {
+  'name': 'salt',
+  'amount': 0.5,
+  'amountMetric': 'teaspoon',
+  },
+  {
+  'name': 'rolled oats',
+  'amount': 3,
+  'amountMetric': 'cups',
+  }, 
+  {
+  'name': 'raisins',
+  'amount': 1,
+  'amountMetric': 'cups',
+  },       
+];
+
+var instructions2 = [
+  {
+  'text': 'Preheat oven to 350 degrees F (175 degrees C).',
+  'associatedIngr': [],
+  'keyword': 'preheat'
+  },
+  {
+  'text': 'In a large bowl, cream together the butter, butter flavored shortening, brown sugar, white sugar, eggs, and vanilla until smooth.',
+  'associatedIngr': [1, 2, 4, 0, 7, 6],
+  'keyword': 'combine'
+  },
+  {
+  'text': 'Press firmly in place and seal.',
+  'associatedIngr': [12],
+  'keyword': 'press'
+  },
+  {
+  'text': 'Combine the flour, baking soda, cinnamon, cloves, and salt; stir into the sugar mixture.',
+  'associatedIngr': [12, 1, 3, 5, 8, 9],
+  'keyword': 'mix2'
+  },
+  {
+  'text': 'Stir in the oats and raisins.',
+  'associatedIngr': [12, 10, 11],
+  'keyword': 'mix3'
+  },
+  {
+  'text': 'Drop by rounded teaspoonfuls onto ungreased cookie sheets.',
+  'associatedIngr': [12],
+  'keyword': 'drop'
+  },
+  {
+  'text': 'Bake 10 to 12 minutes until light and golden.',
+  'associatedIngr': [12],
+  'keyword': 'bake'
+  },
+  {
+  'text': 'Do not overbake.',
+  'associatedIngr': [12],
+  'keyword': 'misc'
+  },
+  {
+  'text': 'Let them cool for 2 minutes before removing from cookie sheets to cool completely.',
+  'associatedIngr': [12],
+  'keyword': 'cool'
+  },
+  {
+  'text': 'Store in airtight container.',
+  'associatedIngr': [12],
+  'keyword': 'store'
+  },
+  {
+  'text': 'Cut dough into desired shapes.',
+  'associatedIngr': [16],
+  'keyword': 'cut'
+  },
+  {
+  'text': 'Place on an ungreased cookie sheet and bake at 375 degrees F (190 degrees C)',
+  'associatedIngr': [17],
+  'keyword': 'bake2'
+  },
+];
+
+//INSERTING STATES FOR G
+
+var states = {}
+var edges = {}
+for(i = 0; i < ingredients.length; i++) {
+  ingredient = ingredients[i]
+  states[ingredient['name']] = { 
+//  states['ingr'+i] = { 
+    description : "name: " + ingredient['name'] + "\n" + 
+      "amount: " + ingredient['amount'] + " " + ingredient['amountMetric'],
+    style : "fill: #f77",
+  };
+}
+
+for(i = 0; i < instructions.length; i++) {
+  instruction = instructions[i]
+//  states['instr'+i] = { 
+  states[instruction['keyword']] = {
+    description : instruction['text']
+  };
+}
+
+
+// Add states to the graph, set labels, and style
+Object.keys(states).forEach(function(state) {
+  var value = states[state];
+  value.label = state;
+  value.rx = value.ry = 5;
+  g.setNode(state, value);
+});
+
+// Set up the edges
+for(i = 0; i < instructions.length; i++) {
+  var associatedIngrs = instructions[i]['associatedIngr'];
+  for(j = 0; j < associatedIngrs.length; j++) {
+    var ingr = associatedIngrs[j];
+    if (ingr < ingredients.length) {
+    //  g.setEdge("ingr"+ingr, "instr"+i, { label: "" });
+        g.setEdge(ingredients[ingr]['name'], instructions[i]['keyword'], { label: "" });
+        if (edges[ingredients[ingr]['name']]) {
+          edges[ingredients[ingr]['name']].append(instructions[i]['keyword']);
+        } else {
+          edges[ingredients[ingr]['name']] = [instructions[i]['keyword']];
+        }   
+    } else {
+      console.log("Setting edge after ingredients" + i)
+   //   g.setEdge("instr"+(i-1), "instr"+i, { label: "" }); 
+      g.setEdge(instructions[i-1]['keyword'], instructions[i]['keyword'], { label: "" }); 
+      if (edges[instructions[i-1]['keyword']]) {
+        edges[instructions[i-1]['keyword']].append(instructions[i]['keyword']);
+      } else {
+        edges[instructions[i-1]['keyword']] = [instructions[i]['keyword']];
+      }   
+    }
+  }
+}
+
+//INSERTING STATES FOR G1
+
+var states1 = {}
+var comStates = {}
+var comEdges = []
+for(i = 0; i < ingredients2.length; i++) {
+  ingredient = ingredients2[i]
+  states1[ingredient['name']] = { 
+    description : "name: " + ingredient['name'] + "\n" + 
+      "amount: " + ingredient['amount'] + " " + ingredient['amountMetric'],
+    style : "fill: #f77",
+  };
+}
+
+for(i = 0; i < instructions2.length; i++) {
+  instruction = instructions2[i] 
+  states1[instruction['keyword']] = {
+    description : instruction['text']
+  };
+}
+
+
+// Add states to the graph, set labels, and style
+Object.keys(states1).forEach(function(state) {
+  console.log(state);
+  if(states[state]) {
+    comStates[state] = states[state];
+  }
+  var value = states1[state];
+  value.label = state;
+  value.rx = value.ry = 5;
+  g1.setNode(state, value);
+});
+
+// Set up the edges
+for(i = 0; i < instructions2.length; i++) {
+  var associatedIngrs = instructions2[i]['associatedIngr'];
+  for(j = 0; j < associatedIngrs.length; j++) {
+    var ingr = associatedIngrs[j];
+    if (ingr < ingredients2.length) {
+        g1.setEdge(ingredients2[ingr]['name'], instructions2[i]['keyword'], { label: "" });
+        if (edges[ingredients2[ingr]['name']]) {
+          console.log(ingredients2[ingr]['name']);
+          var endpoints = edges[ingredients2[ingr]['name']];
+          for (k = 0; k < endpoints.length; k++) {
+            if(endpoints[k] === instructions2[i]['keyword']) {
+              comEdges.push([ingredients2[ingr]['name'], instructions2[i]['keyword']])
+            }
+          }
+        } 
+    } else {
+      console.log("Setting edge after ingredients" + i);
+      g1.setEdge(instructions2[i-1]['keyword'], instructions2[i]['keyword'], { label: "" });
+      if (edges[instructions2[i-1]['keyword']]) {
+        var endpoints = edges[instructions2[i-1]['keyword']];
+        for (j = 0; j < endpoints.length; j++) {
+          if(endpoints[j] === instructions2[i]['keyword']) {
+            comEdges.push([instructions2[i-1]['keyword'], instructions2[i]['keyword']])
+          }
+        }
+      }   
+    }
+  }
+}
+
+//SETTING THE COMMON STATES AND EDGES FOR THE COMBINED GRAPH
+
+console.log(comStates);
+
+// Add states to the graph, set labels, and style
+Object.keys(comStates).forEach(function(state) {
+  var value = comStates[state];
+  value.label = state;
+  value.rx = value.ry = 5;
+  g2.setNode(state, value);
+});
+
+for(i = 0; i < comEdges.length; i++) {
+  var pair = comEdges[i];
+  g2.setEdge(pair[0], pair[1], { label: "" });
+}
+
+// Create the renderer
+var render = new dagreD3.render();
+
+// Set up an SVG group so that we can translate the final graph.
+var svg = d3.select("#first"),
+    inner = svg.append("g");
+
+// Set up zoom support
+var zoom = d3.behavior.zoom().on("zoom", function() {
+    inner.attr("transform", "translate(" + d3.event.translate + ")" +
+                                "scale(" + d3.event.scale + ")");
+  });
+svg.call(zoom);
+
+// Simple function to style the tooltip for the given node.
+var styleTooltip = function(name, description) {
+  return "<p class='name'>" + name + "</p><p class='description'>" + description + "</p>";
+};
+
+// Run the renderer. This is what draws the final graph.
+render(inner, g);
+
+inner.selectAll("g.node")
+  .attr("title", function(v) { return styleTooltip(v, g.node(v).description) })
+  .each(function(v) { $(this).tipsy({ gravity: "w", opacity: 1, html: true }); });
+
+// Center the graph
+var initialScale = 0.75;
+zoom
+  .translate([(svg.attr("width") - g.graph().width * initialScale) / 2, 20])
+  .scale(initialScale)
+  .event(svg);
+svg.attr('height', g.graph().height * initialScale + 40);
+
+//Create the renderer for g1
+
+var render = new dagreD3.render();
+
+// Set up an SVG group so that we can translate the final graph.
+var svg = d3.select("#second"),
+    inner = svg.append("g");
+
+// Set up zoom support
+var zoom = d3.behavior.zoom().on("zoom", function() {
+    inner.attr("transform", "translate(" + d3.event.translate + ")" +
+                                "scale(" + d3.event.scale + ")");
+  });
+svg.call(zoom);
+
+// Simple function to style the tooltip for the given node.
+var styleTooltip = function(name, description) {
+  return "<p class='name'>" + name + "</p><p class='description'>" + description + "</p>";
+};
+
+// Run the renderer. This is what draws the final graph.
+render(inner, g1);
+
+inner.selectAll("g.node")
+  .attr("title", function(v) { return styleTooltip(v, g1.node(v).description) })
+  .each(function(v) { $(this).tipsy({ gravity: "w", opacity: 1, html: true }); });
+
+// Center the graph
+var initialScale = 0.75;
+zoom
+  .translate([(svg.attr("width") - g1.graph().width * initialScale) / 2, 20])
+  .scale(initialScale)
+  .event(svg);
+svg.attr('height', g1.graph().height * initialScale + 40);
+
+//Create renderer for g2
+
+var render = new dagreD3.render();
+
+// Set up an SVG group so that we can translate the final graph.
+var svg = d3.select("#third"),
+    inner = svg.append("g");
+
+console.log(g2);
+
+// Set up zoom support
+var zoom = d3.behavior.zoom().on("zoom", function() {
+    inner.attr("transform", "translate(" + d3.event.translate + ")" +
+                                "scale(" + d3.event.scale + ")");
+  });
+svg.call(zoom);
+
+// Simple function to style the tooltip for the given node.
+var styleTooltip = function(name, description) {
+  return "<p class='name'>" + name + "</p><p class='description'>" + description + "</p>";
+};
+
+// Run the renderer. This is what draws the final graph.
+render(inner, g2);
+
+inner.selectAll("g.node")
+  .attr("title", function(v) { return styleTooltip(v, g2.node(v).description) })
+  .each(function(v) { $(this).tipsy({ gravity: "w", opacity: 1, html: true }); });
+
+// Center the graph
+var initialScale = 0.75;
+zoom
+  .translate([(svg.attr("width") - g2.graph().width * initialScale) / 2, 20])
+  .scale(initialScale)
+  .event(svg);
+svg.attr('height', g2.graph().height * initialScale + 40);
+</script>
+
+<script src="/javascripts/demo.js"></script>
