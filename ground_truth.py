@@ -97,7 +97,7 @@ finalAssociations = [
 
 {'#no-action#': [], 'stir': [['custard']]},
 
-{'#no-action#': [], 'reduce': [['custard']]},
+{'cook': [['custard']], '#no-action#': [], 'reduce': []},
 
 {'#no-action#': [], 'place': [['bread']]},
 
@@ -145,7 +145,7 @@ finalAssociations = [
 
 {'#no-action#': [], 'stir': [['custard']]},
 
-{'#no-action#': [], 'reduce': [['custard']]},
+{'cook': [['custard']], '#no-action#': [], 'reduce': []},
 
 {'#no-action#': [], 'place': [['bread']]},
 
@@ -165,7 +165,7 @@ finalAssociations = [
 
 {'add': [['flour'], ['salt']], '#no-action#': []},
 
-{'knead': [], '#no-action#': [], 'form': []}, #ALERT
+{'knead': [], '#no-action#': []}, #ALERT
 
 {'add': [['flour']], '#no-action#': [], 'knead': []},
 
@@ -233,7 +233,7 @@ finalAssociations = [
 
 {'add': [['flour'], ['salt']], '#no-action#': []},
 
-{'knead': [], '#no-action#': [], 'form': []},
+{'knead': [], '#no-action#': []},
 
 {'add': [['flour']], '#no-action#': [], 'knead': []},
 

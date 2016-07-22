@@ -29,7 +29,8 @@ cookingMeasurements = {'pinch', 'dash', 'by', 'of', 'into', 'or', 'for', 'to', '
 compoundIngredientDict = pickle.load( open( "save_compound_ingredients.p", "rb" ) )
 ingredientSet = Set(pickle.load( open( "save_ingredient_list.p", "rb" ) ) )
 cookingVerbSet = Set(pickle.load( open( "save_cooking_verb.p", "rb" ) ) )
-groundTruth = pickle.load( open( "ground_truth.p", "rb" ) ) 
+#groundTruth = pickle.load( open( "ground_truth.p", "rb" ) ) 
+groundTruth = pickle.load( open( "ground_truth_cookie.p", "rb" ) ) 
 hesitateVerbs = pickle.load( open( "save_hesitate_verbs.p", "rb" ) ) 
 cookingVerbDict = dict.fromkeys(cookingVerbSet, 0)
 
@@ -79,16 +80,23 @@ def extractIngredientKeys(ingredient):
 				compoundKeys = (Set(extraKeys) & Set(ingredient))
 				compoundKeys.add(elem)
 				flag = False
-			else:
-				compoundKeys.add(elem)
-				flag = False
-			break
-		elif elem in ingredientSet:
-			compoundKeys.add(elem)
-			flag = False
-			break
-	if flag:
-		return extractIngredientKeysPruning(ingredient)
+				break
+
+	#		elif 'isolated' not in compoundIngredientDict[elem]: 
+	#		else:
+	#			compoundKeys.add(elem)
+	#			flag = False
+	#			break
+	if (flag):
+		for y in range(len(ingredient)): 
+			if ingredient[y] in ingredientSet:
+				compoundKeys.add(ingredient[y])
+	#	elif elem in ingredientSet:
+	#		compoundKeys.add(elem)
+	#		flag = False
+	#		break
+	if len(compoundKeys) is 0:
+		return Set(extractIngredientKeysPruning(ingredient) )
 	else:
 		return compoundKeys
 
@@ -104,7 +112,6 @@ def extractInstructionLabel(instruction, labels):
 		wordChunk = instruction[x]
 		if wordChunk.upper() in cookingVerbSet:
 			if x is 0 or wordChunk in labels or wordChunk.upper() not in hesitateVerbs:
-				print wordChunk
 				cookingVerbDict[wordChunk.upper()] += 1
 				assured.append(wordChunk)
 			else:
@@ -119,6 +126,29 @@ def extractInstructionLabel(instruction, labels):
 def print_fine_pos(token):
     return (token.tag_)
 
+def canUseSingle(wordChunk, ingrSet):
+	currWord = ''.join(list(wordChunk & ingrSet) )
+	otherWord = ''.join(list(ingrSet - wordChunk) )
+	if currWord in compoundIngredientDict:
+		moreKeys = compoundIngredientDict[currWord]
+		if otherWord not in moreKeys: 
+			return False
+		if moreKeys[otherWord] is None:
+			return True
+		if moreKeys[otherWord] is 1 or 2:
+			return False
+	elif otherWord in compoundIngredientDict:
+		moreKeys = compoundIngredientDict[otherWord]
+		if currWord not in moreKeys: 
+			return False
+		if moreKeys[currWord] is None:
+			return False
+		if moreKeys[currWord] is 1:
+			return True
+	return False
+
+
+
 def pos_tags(sentence):
 	tokens = nlp(sentence)
 	tags = []
@@ -130,8 +160,8 @@ def pos_tags(sentence):
 
 #set of tuples of used ingredients + the new ingredient
 
-query = ("SELECT name, type, ingredients, recipe_instructions FROM cooking_recipes_reformat WHERE type='sandwich'")
-#query = 'SELECT name, type, ingredients, recipe_instructions FROM cooking_recipes_reformat WHERE type="cookie" AND name LIKE "%chocolate chip%"'; 
+#query = ("SELECT name, type, ingredients, recipe_instructions FROM cooking_recipes_reformat WHERE type='sandwich'")
+query = 'SELECT name, type, ingredients, recipe_instructions FROM cooking_recipes_reformat WHERE type="cookie" AND name LIKE "%chocolate chip%"'; 
 cursor.execute(query)
 results = cursor.fetchall()
 finalAssociationsCounter = 0
@@ -141,13 +171,13 @@ for name, type, rawIngr, rawInstr in results:
 	ingredients = []
 	instructions = []
 
-	#INSERT INTO TABLE: recipe
+#	INSERT INTO TABLE: recipe
 	# query = ("INSERT INTO recipes(recipe_name, type) VALUES(%s, %s)")
 	# cursor.execute(query, (name, type))
 	# link.commit()
 	# query = ("SELECT LAST_INSERT_ID()")
 	# cursor.execute(query)
-	#recipe_id = cursor.fetchone()[0]
+	# recipe_id = cursor.fetchone()[0]
 
 	#pre-processing so that each block-text is split accordingly
 
@@ -168,22 +198,22 @@ for name, type, rawIngr, rawInstr in results:
 		print instruction
 		labels = pos_tags(instruction)
 		instruction = unicodedata.normalize('NFKD', instruction).encode('ascii','ignore')
-	#	target.write(instruction + "\n")
-		#INSERT INTO TABLE: steps
+		target.write(instruction + "\n")
+	#	INSERT INTO TABLE: steps
 		# query = ("INSERT INTO steps(recipe_id, text_line) VALUES(%s, %s)")
 		# cursor.execute(query, (recipe_id, instruction))
 		# link.commit()
-		#query = ("SELECT LAST_INSERT_ID()")
-		#cursor.execute(query)
-		#step_id = cursor.fetchone()[0]
+		# query = ("SELECT LAST_INSERT_ID()")
+		# cursor.execute(query)
+		# step_id = cursor.fetchone()[0]
 
 		instructionKeys = extractInstructionKeys(instruction)
 		print instructionKeys
 		finalLabel = extractInstructionLabel(instructionKeys, labels)
-	#	target.write("Ingredients: " + str(ingredients) + "\n")
+		target.write("Ingredients: " + str(ingredients) + "\n")
 		compoundFlag = False
 		
-	#	target.write(str(finalLabel) + "\n")
+		target.write(str(finalLabel) + "\n")
 		usedIngredients = [0] * len(ingredients)
 		finalAssociations = {}
 	 	currIndex = 0
@@ -211,11 +241,19 @@ for name, type, rawIngr, rawInstr in results:
 	 			ingredient = ingredients[y]
 	 			ingrSet = Set(ingredient)
 	 			if wordChunk in ingrSet and not usedIngredients[y]:
-	 				associatedIngredient.append(wordChunk)
 	 				if len(ingrSet) > 1:
 	 					if (x < len(instructionKeys)-1 and instructionKeys[x+1] in ingrSet):
+	 						associatedIngredient.append(wordChunk)
 	 						associatedIngredient.append(instructionKeys[x+1]) 
 	 						compoundFlag = True
+	 					elif (x > 0 and instructionKeys[x-1] in ingrSet):
+	 						associatedIngredient.append(wordChunk)
+	 						associatedIngredient.append(instructionKeys[x-1]) 
+	 						compoundFlag = True
+	 					elif canUseSingle(Set([wordChunk]), ingrSet):
+	 						associatedIngredient.append(wordChunk)
+	 				else:
+	 					associatedIngredient.append(wordChunk)
 	 				usedIngredients[y] = 1
 	 				break
 
@@ -225,27 +263,27 @@ for name, type, rawIngr, rawInstr in results:
 				# cursor.execute(query, (recipe_id, step_id, 'ingredient', rank, ' '.join(associatedIngredient)))
 				# link.commit()
 				rank += 1
-	 		#	target.write("Associated Ingredients: " + str(associatedIngredient) + "\n")
-	 			finalAssociations[currAction].append(associatedIngredient)
+				finalAssociations[currAction].append(associatedIngredient)
+	 			target.write("Associated Ingredients: " + str(associatedIngredient) + "\n")
 	 	print ingredients
 	 	print "Final Associations: ", finalAssociations
 	 	if finalAssociationsCounter >= len(groundTruth):
-	 		print float(matches)/finalAssociationsCounter
-	 		print cookingVerbDict
-	 		print mismatchList
+	 	 	print float(matches)/finalAssociationsCounter
+	 	 	print cookingVerbDict
+	 	 	print mismatchList
 	 		#return
-	 	print groundTruth[finalAssociationsCounter]
-	 	if Set(groundTruth[finalAssociationsCounter]) == Set(finalAssociations):
-	 		print "match"
-	 		matches += 1
-	 	else:
-	 		print "mismatch"
-			mismatchList.append(finalAssociationsCounter)
-	 	print finalAssociationsCounter
-	 	finalAssociationsCounter += 1
-	 #	target.write("Final Associations: " + str(finalAssociations) + "\n")
+	 #  	print groundTruth[finalAssociationsCounter]
+		# if Set(groundTruth[finalAssociationsCounter]) == Set(finalAssociations):
+	 #  		print "match"
+	 #  		matches += 1
+	 #  	else:
+	 #  		print "mismatch"
+		#  	mismatchList.append(finalAssociationsCounter)
+	 # 	print finalAssociationsCounter
+	 # 	finalAssociationsCounter += 1
+	 	target.write("Final Associations: " + str(finalAssociations) + "\n")
 		print "#####################################"
 
-	#	target.write("####################################" + "\n")
+		target.write("####################################" + "\n")
 target.close()
 

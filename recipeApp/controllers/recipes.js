@@ -47,8 +47,7 @@ function getNewInstruction(recipe, ingredients) {
 					newInstructions[newInstructions.length-1]['associatedIngr'].push(findAssocIngr(ingredients, steps[j].text))
 				} else {
 					newInstructions.push({'text': recipe[i][0], 'associatedIngr':[steps[j].text], 'keyword': 'no-action'});
-				}
-				
+				}		
 			}
 		}
 	}
