@@ -35,8 +35,8 @@ hesitateVerbs = pickle.load( open( "save_hesitate_verbs.p", "rb" ) )
 cookingVerbDict = dict.fromkeys(cookingVerbSet, 0)
 
 print "Opening the file..."
-target = open('output-cookie.txt', 'w')
-target.truncate()
+#target = open('output-cookie.txt', 'w')
+#target.truncate()
 
 def extractIngredientKeysPruning(ingredient):
 	ingredientsCopy = deepcopy(ingredient)
@@ -65,19 +65,23 @@ def cleanRawString(wordChunk, verbFlag):
 	wordChunk = wordChunk.lower()
 	if not verbFlag and p.singular_noun(wordChunk):
 		wordChunk = p.singular_noun(wordChunk)
-	return wordChunk	
+	return wordChunk
 
 def extractIngredientKeys(ingredient):
 	flag = True
 	ingredient = [str(x) for x in ingredient]
 	compoundKeys = Set([])
+#	ingredient = [cleanRawString(x, None) for x in ingredient]
 	for x in range(len(ingredient)):
 		ingredient[x] = cleanRawString(ingredient[x], None)
 		elem = ingredient[x]
 		if elem in compoundIngredientDict:
 			extraKeys = compoundIngredientDict[elem]
-			if Set(extraKeys) & Set(ingredient):
-				compoundKeys = (Set(extraKeys) & Set(ingredient))
+			print Set(ingredient)
+			print Set(extraKeys)
+			intersection = Set(extraKeys) & Set(ingredient)
+			if intersection:
+				compoundKeys = intersection
 				compoundKeys.add(elem)
 				flag = False
 				break
@@ -96,7 +100,8 @@ def extractIngredientKeys(ingredient):
 	#		flag = False
 	#		break
 	if len(compoundKeys) is 0:
-		return Set(extractIngredientKeysPruning(ingredient) )
+	#	return Set(extractIngredientKeysPruning(ingredient) )
+		return Set([])
 	else:
 		return compoundKeys
 
@@ -126,6 +131,7 @@ def extractInstructionLabel(instruction, labels):
 def print_fine_pos(token):
     return (token.tag_)
 
+#rewrite canUseSingle so that you take the greatest instead
 def canUseSingle(wordChunk, ingrSet):
 	currWord = ''.join(list(wordChunk & ingrSet) )
 	otherWord = ''.join(list(ingrSet - wordChunk) )
@@ -187,8 +193,8 @@ for name, type, rawIngr, rawInstr in results:
 		#INSERT INTO TABLE: ingredients
 		print x
 		ingredient = extractIngredientKeys(x.split())
-		# query = ("INSERT INTO ingredients(recipe_id, text_name) VALUES(%s, %s)")
-		# cursor.execute(query, (recipe_id, ' '.join(ingredient)))
+		# query = ("INSERT INTO ingredients(recipe_id, text_name, raw_text) VALUES(%s, %s, %s)")
+		# cursor.execute(query, (recipe_id, ' '.join(ingredient), x))
 		# link.commit()
 		ingredients.append(extractIngredientKeys(x.split()))
 	lineInstructions = rawInstr.split('.')
@@ -198,7 +204,7 @@ for name, type, rawIngr, rawInstr in results:
 		print instruction
 		labels = pos_tags(instruction)
 		instruction = unicodedata.normalize('NFKD', instruction).encode('ascii','ignore')
-		target.write(instruction + "\n")
+	#	target.write(instruction + "\n")
 	#	INSERT INTO TABLE: steps
 		# query = ("INSERT INTO steps(recipe_id, text_line) VALUES(%s, %s)")
 		# cursor.execute(query, (recipe_id, instruction))
@@ -210,10 +216,10 @@ for name, type, rawIngr, rawInstr in results:
 		instructionKeys = extractInstructionKeys(instruction)
 		print instructionKeys
 		finalLabel = extractInstructionLabel(instructionKeys, labels)
-		target.write("Ingredients: " + str(ingredients) + "\n")
+	#	target.write("Ingredients: " + str(ingredients) + "\n")
 		compoundFlag = False
 		
-		target.write(str(finalLabel) + "\n")
+	#	target.write(str(finalLabel) + "\n")
 		usedIngredients = [0] * len(ingredients)
 		finalAssociations = {}
 	 	currIndex = 0
@@ -229,10 +235,12 @@ for name, type, rawIngr, rawInstr in results:
 	 			continue
 	 		if currIndex < len(finalLabel) and wordChunk is finalLabel[currIndex]:
 	 			currIndex += 1
-	 		# 	query = ("INSERT INTO node(recipe_id, step_id, class, rank, text) VALUES(%s, %s, %s, %s, %s)")
+	 		#  	query = ("INSERT INTO node(recipe_id, step_id, class, rank, text) VALUES(%s, %s, %s, %s, %s)")
 				# cursor.execute(query, (recipe_id, step_id, 'action', rank, wordChunk))
 				# link.commit()
 				rank += 1
+				if wordChunk in finalAssociations:
+					wordChunk = wordChunk + "2"
 	 			finalAssociations[wordChunk] = []
 	 			currAction = wordChunk
 	 		for y in range(len(ingredients)):
@@ -258,32 +266,32 @@ for name, type, rawIngr, rawInstr in results:
 	 				break
 
 	 		if (len(associatedIngredient) > 0):
-	 		 	print "Associated Ingredients: " + str(associatedIngredient)
-	 		# 	query = ("INSERT INTO node(recipe_id, step_id, class, rank, text) VALUES(%s, %s, %s, %s, %s)")
+	 		#  	print "Associated Ingredients: " + str(associatedIngredient)
+	 		#  	query = ("INSERT INTO node(recipe_id, step_id, class, rank, text) VALUES(%s, %s, %s, %s, %s)")
 				# cursor.execute(query, (recipe_id, step_id, 'ingredient', rank, ' '.join(associatedIngredient)))
 				# link.commit()
 				rank += 1
 				finalAssociations[currAction].append(associatedIngredient)
-	 			target.write("Associated Ingredients: " + str(associatedIngredient) + "\n")
+	 		#	target.write("Associated Ingredients: " + str(associatedIngredient) + "\n")
 	 	print ingredients
 	 	print "Final Associations: ", finalAssociations
-	 	if finalAssociationsCounter >= len(groundTruth):
-	 	 	print float(matches)/finalAssociationsCounter
-	 	 	print cookingVerbDict
-	 	 	print mismatchList
-	 		#return
-	 #  	print groundTruth[finalAssociationsCounter]
+	 	# if finalAssociationsCounter >= len(groundTruth):
+	 	#  	print float(matches)/finalAssociationsCounter
+	 	#  	print cookingVerbDict
+	 	#  	print mismatchList
+	 	# 	#return
+	 #   	print groundTruth[finalAssociationsCounter]
 		# if Set(groundTruth[finalAssociationsCounter]) == Set(finalAssociations):
-	 #  		print "match"
-	 #  		matches += 1
-	 #  	else:
-	 #  		print "mismatch"
-		#  	mismatchList.append(finalAssociationsCounter)
-	 # 	print finalAssociationsCounter
-	 # 	finalAssociationsCounter += 1
-	 	target.write("Final Associations: " + str(finalAssociations) + "\n")
+	 #   		print "match"
+	 #   		matches += 1
+	 #   	else:
+	 #   		print "mismatch"
+		#   	mismatchList.append(finalAssociationsCounter)
+	 #  	print finalAssociationsCounter
+	  	finalAssociationsCounter += 1
+	 	#target.write("Final Associations: " + str(finalAssociations) + "\n")
 		print "#####################################"
 
-		target.write("####################################" + "\n")
+		#target.write("####################################" + "\n")
 target.close()
 

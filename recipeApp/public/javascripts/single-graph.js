@@ -8,13 +8,72 @@ var g1 = new dagreD3.graphlib.Graph().setGraph({});
 //Create a common edges and states graph
 var g2 = new dagreD3.graphlib.Graph().setGraph({});
 
+var recognizeAssociations = {
+  'dough' : ['flour'],
+  'sandwich' : ['bread'],
+  'toast' : ['bread'],
+  'slice' : ['bread', 'roll'],
+  'dry' : ['flour', 'salt', 'powder'],
+  'wet' : ['egg', 'butter'],
+};
+
+var nodeList = [];
+
+var nodeSet = {};
+
+var branchSet = {};
+
+var seenBeforeIngr = {};
+
 var seenBefore = {};
 
+var mostRecentNode = '';
+
+// function addToNodeList(firstNode, nextNode, ingrFlag) {
+
+// }
+
+// function getRecentNode(keyWord) {
+  
+// }
+
+function addToNodeList(firstNode, nextNode, ingrFlag) {
+  var flag = true;
+  console.log(firstNode);
+  console.log(nextNode);
+  for(var i=0;i<nodeList.length;i++) {
+    var currNode = nodeList[i];
+    if (ingrFlag && nextNode === currNode['node']) {
+      nodeList[i]['assocIngr'][firstNode] = 1;
+      flag = false;
+    } else if (currNode['node'] === firstNode) {
+      nodeList[i]['node'] = nextNode;
+      flag = false;
+    }
+  }
+  if(flag) {
+    nodeList.push({'node': nextNode, 'assocIngr': {}});
+    if (ingrFlag) {
+      nodeList[0].assocIngr[firstNode] = 1;
+    }
+  }
+  console.log(nodeList);
+}
+
+function getRecentNode(keyWord) {
+  for(var i=0;i<nodeList.length;i++) {
+    if(nodeList[i]['assocIngr'][keyWord]) {
+      nodeList[i]['assocIngr'][keyWord] += 1;
+      return nodeList[i]['node']; 
+    }
+  }
+  return mostRecentNode;
+}
+
+
 ProgressModel.startLoad(function(error, jsonResults) {
-  var ingredients = jsonResults['data'][2][1];
-  var instructions = jsonResults['data'][2][0];
-  console.log(ingredients);
-  console.log(instructions);
+  var ingredients = jsonResults['data'][1][1];
+  var instructions = jsonResults['data'][1][0];
   var states = {}
   var edges = {}
   for(i = 0; i < ingredients.length; i++) {
@@ -54,20 +113,43 @@ ProgressModel.startLoad(function(error, jsonResults) {
   // Set up the edges
   for(i = 0; i < instructions.length; i++) {
     var associatedIngrs = instructions[i]['associatedIngr'];
+    associatedIngrs = associatedIngrs.filter(function(item, pos) {
+      return associatedIngrs.indexOf(item) == pos;
+    });
     for(j = 0; j < associatedIngrs.length; j++) {
       var ingr = associatedIngrs[j];
       if (ingr < ingredients.length) {
       //  g.setEdge("ingr"+ingr, "instr"+i, { label: "" });
-          g.setEdge(ingredients[ingr]['name'], instructions[i]['keyword'], { label: "" });
-          if (edges[ingredients[ingr]['name']]) {
-            edges[ingredients[ingr]['name']].push(instructions[i]['keyword']);
+          if(seenBeforeIngr[ingredients[ingr]['name']]) {
+            seenBeforeIngr[ingredients[ingr]['name']] += 1;
+            var mostRecent = getRecentNode(ingredients[ingr]['name']);
+            mostRecentNode = mostRecent;
+            if (mostRecent != instructions[i]['keyword']) {
+              g.setEdge(mostRecent, instructions[i]['keyword'], { label: "" });
+              addToNodeList(mostRecent, instructions[i]['keyword'], false); 
+            }
+            if (edges[mostRecent]) {
+              edges[mostRecent].push(instructions[i]['keyword']);
+            } else {
+              edges[mostRecent] = [instructions[i]['keyword']];
+            }  
           } else {
-            edges[ingredients[ingr]['name']] = [instructions[i]['keyword']];
-          }   
+            seenBeforeIngr[ingredients[ingr]['name']] = 1;
+            g.setEdge(ingredients[ingr]['name'], instructions[i]['keyword'], { label: "" });
+            addToNodeList(ingredients[ingr]['name'], instructions[i]['keyword'], true); 
+            mostRecentNode = instructions[i]['keyword'];
+            if (edges[ingredients[ingr]['name']]) {
+              edges[ingredients[ingr]['name']].push(instructions[i]['keyword']);
+            } else {
+              edges[ingredients[ingr]['name']] = [instructions[i]['keyword']];
+            }  
+          }
+          console.log("EDGE SET");        
       } else {
         console.log("Setting edge after ingredients" + i)
      //   g.setEdge("instr"+(i-1), "instr"+i, { label: "" }); 
-        g.setEdge(instructions[i-1]['keyword'], instructions[i]['keyword'], { label: "" }); 
+        g.setEdge(instructions[i-1]['keyword'], instructions[i]['keyword'], { label: "" });
+        addToNodeList(instructions[i-1]['keyword'], instructions[i]['keyword'], false); 
         if (edges[instructions[i-1]['keyword']]) {
           edges[instructions[i-1]['keyword']].push(instructions[i]['keyword']);
         } else {

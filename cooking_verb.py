@@ -135,6 +135,7 @@ cookingVerbs = {
 'SOFTEN',
 'SCRAPE',
 'SCRUB',
+'RUB',
 'SEASON',
 'RIB',
 'SEPARATE',

@@ -443,7 +443,7 @@ finalAssociations = [
 
  {'heat': [], '#no-action#': [], 'spray': [['cooking'], ['spray']]},
 
-{'season': [['salt']], '#no-action#': [], 'crack': [['egg']]},
+ {'season': [['salt']], '#no-action#': [], 'crack': [['egg']]},
 
  {'#no-action#': [], 'cook': [['egg']]},
 

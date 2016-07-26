@@ -8,6 +8,7 @@ var con = mysql.createConnection({
   'database': 'mysql',
 });
 
+
 //Establishing mysql connection
 con.connect(function(err){
   if(err){
@@ -20,19 +21,20 @@ con.connect(function(err){
 var recipe_data = {'percent_complete': 0.0, 'data': []};
 var num_recipes = 0;
 
-function findAssocIngr(ingredients, matchIngredient) {
+function findAssocIngr(ingredients, matchIngredient, usedIngredients) {
+	var finalResults = [];
 	for(i = 0; i<ingredients.length;i++) {
 		var matchKeys = matchIngredient.split(" ");
 		var currKeys = ingredients[i].name.split(" ");
 		for(j=0;j<matchKeys.length;j++) {
 			for(k=0;k<currKeys.length;k++) {
 				if(matchKeys[j] === currKeys[k]) {
-					return i;
+					finalResults.push(i);
 				}
 			}
 		}
 	}
-	return -1;
+	return finalResults;
 }
 
 function getNewInstruction(recipe, ingredients) {
@@ -44,7 +46,7 @@ function getNewInstruction(recipe, ingredients) {
 				newInstructions.push({'text': recipe[i][0], 'associatedIngr':[], 'keyword': steps[j].text});
 			} else {
 				if (newInstructions.length > 0) {
-					newInstructions[newInstructions.length-1]['associatedIngr'].push(findAssocIngr(ingredients, steps[j].text))
+					newInstructions[newInstructions.length-1]['associatedIngr'].push(findAssocIngr(ingredients, steps[j].text));
 				} else {
 					newInstructions.push({'text': recipe[i][0], 'associatedIngr':[steps[j].text], 'keyword': 'no-action'});
 				}		
@@ -69,14 +71,16 @@ function getInstruction(recipe, ingredients) {
     				instruction.push({'text': text_line, 'keyword': node.text, 'associatedIngr': []});
     				var lastInsert = instruction.length-1;	
     				if(instruction.length > 1) {
-    					instruction[instruction.length-1]['associatedIngr'].push(ingredients.length+1);
+    					(instruction[instruction.length-1]['associatedIngr']).push(ingredients.length+1);
     				}
     			} else {
     				if (lastInsert != -1) {
-    					instruction[lastInsert]['associatedIngr'].push(findAssocIngr(ingredients, node.text));
+    					instruction[lastInsert]['associatedIngr'] = instruction[lastInsert]['associatedIngr'].concat(findAssocIngr(ingredients, node.text));
+    					console.log("HELLMAN's");
+    					console.log(instruction[lastInsert]['associatedIngr']);
     				} else {
     					var lastInsert = 0;
-    					instruction.push({'text': text_line, 'keyword': node.text, 'associatedIngr': [findAssocIngr(ingredients, node.text)]});
+    					instruction.push({'text': text_line, 'keyword': node.text, 'associatedIngr': findAssocIngr(ingredients, node.text)});
     					if(instruction.length > 1) {
     						instruction[instruction.length-1]['associatedIngr'].push(ingredients.length+1);
     					}	
@@ -98,7 +102,7 @@ exports.get_recipes = function (req, res) {
 exports.recipes = function (req, res) {
   //Drawing information from the database for later parsing
 	recipes = {}
-	con.query('SELECT * FROM recipes LIMIT 10',function(err,rows){
+	con.query('SELECT * FROM recipes where type="cookie" LIMIT 10',function(err,rows){
   		if(err) throw err;
   		for (i = 0; i < rows.length; i++) {
     		row = rows[i];

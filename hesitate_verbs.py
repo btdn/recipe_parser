@@ -11,6 +11,7 @@ verb_nouns = {
 'CREAM',
 'BLEND',
 'REVERSE',
+'RUB',
 'WIND',
 'PRESS',
 'HEAT',
@@ -32,6 +33,7 @@ verb_nouns = {
 'INSERT',
 'TOAST',
 'CRACK',
+'WHIP',
 'BROWN', #still get a lot of errors here
 'CRUMBLE',
 'STUFF',
