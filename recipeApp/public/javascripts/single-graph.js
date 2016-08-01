@@ -29,42 +29,35 @@ var seenBefore = {};
 
 var mostRecentNode = '';
 
-// function addToNodeList(firstNode, nextNode, ingrFlag) {
-
-// }
-
-// function getRecentNode(keyWord) {
-  
-// }
-
 function addToNodeList(firstNode, nextNode, ingrFlag) {
   var flag = true;
   console.log(firstNode);
   console.log(nextNode);
+  console.log(nodeList);
+  console.log(ingrFlag);
   for(var i=0;i<nodeList.length;i++) {
     var currNode = nodeList[i];
     if (ingrFlag && nextNode === currNode['node']) {
-      nodeList[i]['assocIngr'][firstNode] = 1;
-      flag = false;
+      nodeList[i]['ingr'][firstNode] = 1;
+      return
     } else if (currNode['node'] === firstNode) {
       nodeList[i]['node'] = nextNode;
-      flag = false;
+      return
     }
   }
-  if(flag) {
-    nodeList.push({'node': nextNode, 'assocIngr': {}});
-    if (ingrFlag) {
-      nodeList[0].assocIngr[firstNode] = 1;
-    }
+  console.log(nextNode);
+  nodeList.push({'node': nextNode, 'ingr': []});
+  if (ingrFlag) {
+    nodeList[0].assocIngr[firstNode] = 1;
   }
-  console.log(nodeList);
+
 }
 
 function getRecentNode(keyWord) {
-  for(var i=0;i<nodeList.length;i++) {
-    if(nodeList[i]['assocIngr'][keyWord]) {
-      nodeList[i]['assocIngr'][keyWord] += 1;
-      return nodeList[i]['node']; 
+  for(var k=0;k<nodeList.length;k++) {
+    if(nodeList[k]['ingr'][keyWord]) {
+      nodeList[k]['ingr'][keyWord] += 1;
+      return nodeList[k]['node']; 
     }
   }
   return mostRecentNode;
@@ -72,8 +65,9 @@ function getRecentNode(keyWord) {
 
 
 ProgressModel.startLoad(function(error, jsonResults) {
-  var ingredients = jsonResults['data'][1][1];
-  var instructions = jsonResults['data'][1][0];
+  var ingredients = jsonResults['data'][21][1];
+  var instructions = jsonResults['data'][21][0];
+  console.log(jsonResults['data']);
   var states = {}
   var edges = {}
   for(i = 0; i < ingredients.length; i++) {
@@ -143,10 +137,8 @@ ProgressModel.startLoad(function(error, jsonResults) {
             } else {
               edges[ingredients[ingr]['name']] = [instructions[i]['keyword']];
             }  
-          }
-          console.log("EDGE SET");        
+          }      
       } else {
-        console.log("Setting edge after ingredients" + i)
      //   g.setEdge("instr"+(i-1), "instr"+i, { label: "" }); 
         g.setEdge(instructions[i-1]['keyword'], instructions[i]['keyword'], { label: "" });
         addToNodeList(instructions[i-1]['keyword'], instructions[i]['keyword'], false); 

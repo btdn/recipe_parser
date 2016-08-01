@@ -102,7 +102,7 @@ exports.get_recipes = function (req, res) {
 exports.recipes = function (req, res) {
   //Drawing information from the database for later parsing
 	recipes = {}
-	con.query('SELECT * FROM recipes where type="cookie" LIMIT 10',function(err,rows){
+	con.query('SELECT DISTINCT * FROM recipes where type="cookie" LIMIT 30',function(err,rows){
   		if(err) throw err;
   		for (i = 0; i < rows.length; i++) {
     		row = rows[i];
@@ -131,7 +131,7 @@ exports.recipes = function (req, res) {
 	        					newIngredient.push({'name':ingredient.text_name, 'amount': 1, 'metric': 'cup'});
 	        				}
 	        				var newInstruction = getInstruction(recipes[recipe_id], newIngredient);
-	        				recipe_data['data'].push([newInstruction, newIngredient]);
+	        				recipe_data['data'].push([newInstruction, newIngredient, recipe_id]);
 	        			} else {	        			
 	          				rowS = rowsS[i]
 	          				console.log("We're on step " + i + " recipe_id " + recipe_id + "whose text is " + rowS.text_line)
