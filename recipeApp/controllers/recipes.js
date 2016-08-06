@@ -8,7 +8,6 @@ var con = mysql.createConnection({
   'database': 'mysql',
 });
 
-
 //Establishing mysql connection
 con.connect(function(err){
   if(err){
@@ -102,7 +101,7 @@ exports.get_recipes = function (req, res) {
 exports.recipes = function (req, res) {
   //Drawing information from the database for later parsing
 	recipes = {}
-	con.query('SELECT DISTINCT * FROM recipes where type="cookie" LIMIT 30',function(err,rows){
+	con.query('SELECT DISTINCT * FROM recipes where type="cookie" LIMIT 130',function(err,rows){
   		if(err) throw err;
   		for (i = 0; i < rows.length; i++) {
     		row = rows[i];

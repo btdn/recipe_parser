@@ -5,6 +5,10 @@
     var PROGRESS_URL = 'get_recipes';
     var STATUS_OK = 200;
 
+    function getSimilarityScores(recipes) {
+
+    }
+
     ProgressModel.getCurr = function(callback) {
         var request = new XMLHttpRequest();
         request.addEventListener('load', function(error) {
