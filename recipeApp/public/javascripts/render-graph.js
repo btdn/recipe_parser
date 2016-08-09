@@ -1,27 +1,80 @@
 (function(){
 	var GraphRenderer = {};
 
-	GraphRenderer.render = function(index) {
-		var g = new dagreD3.graphlib.Graph().setGraph({});
+	var colorGradient = ["#CC8866", "#E08152", "#F57A3D", "#FF5500"];
+	var colorGradientS = ['#B8D3E0', '#94BDD1', '#70A7C2', '#4D90B2'];
+	var ingrFreq = null;
+	var instrFreq = null;
+	function calculateHex(keyword, ingrFlag, ingr, instr) {
+		if(ingr) {
+			ingrFreq = ingr;
+			instrFreq = instr;
+		}
+		console.log(keyword);
+		if(ingrFlag) {
+			console.log("INGR CASE");
+			for(var i = 0; i < ingrFreq.length; i++) {
+				if(ingrFreq[i].key === keyword) {
+					var score = i/(ingrFreq.length);
+					console.log(score);
+					if(score < 0.25) {
+						return colorGradient[0];
+					} else if (score < 0.5) {
+						return colorGradient[1];
+					} else if (score < 0.75) {
+						return colorGradient[2];
+					} else {
+						return colorGradient[3];
+					}
+				}
+			}
+		} else {
+			console.log("INSTR CASE");
+			for(var i = 0; i < instrFreq.length; i++) {
+				if(instrFreq[i].key === keyword) {
+					var score = i/(instrFreq.length);
+					console.log(score);
+					if(score < 0.25) {
+						return colorGradientS[0];
+					} else if (score < 0.5) {
+						return colorGradientS[1];
+					} else if (score < 0.75) {
+						return colorGradientS[2];
+					} else {
+						return colorGradientS[3];
+					}
+				}				
+			}
+		}
+	}
 
+	GraphRenderer.render = function(index, ingrFreq, instrFreq) {
+		var g = new dagreD3.graphlib.Graph().setGraph({});	
 		var currGraph = window.sessionStorage.getItem('currSearch');
 		currGraph = JSON.parse(currGraph);
 		var edges = currGraph[index][1];
 		var states = currGraph[index][0];
 				    // Add states to the graph, set labels, and style
 	    Object.keys(states).forEach(function(state) {
+	      var flag=false;
 	      var value = states[state];
 	      value.label = state;
+	      console.log(value);
+	      if ('style' in value) {
+	      	flag = true;
+	      }
+	      var hex = calculateHex(value.label, flag, ingrFreq, instrFreq);
+	      value.style = "fill: " +  hex;
 	      value.rx = value.ry = 5;
 	      g.setNode(state, value);
 	    });
+
+	    
 
 	      // Add states to the graph, set labels, and style
 	    for(key in edges) {
 	      var secondEdges = edges[key];
 	      for(var j = 0; j < secondEdges.length; j++) {
-	        console.log(key);
-	        console.log(secondEdges[j]);
 	        g.setEdge(key, secondEdges[j], { label: "" });
 	      }
 	    }

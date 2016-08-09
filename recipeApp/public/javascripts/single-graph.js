@@ -18,6 +18,8 @@ var recognizeAssociations = {
 
 var branchSet = {};
 var nodeList = [];
+var seenBeforeIngrTotal = {};
+var seenBeforeInstrTotal = {};
 
 
 
@@ -161,6 +163,11 @@ function processStatesAndEdges(ingredients, instructions) {
   var seenBefore = {};
   for(i = 0; i < ingredients.length; i++) {
     ingredient = ingredients[i]
+    if(seenBeforeIngrTotal[ingredient['name']]) {
+      seenBeforeIngrTotal[ingredient['name']] += 1;
+    } else {
+      seenBeforeIngrTotal[ingredient['name']] = 1;
+    }
     states[ingredient['name']] = { 
   //  states['ingr'+i] = { 
       description : "name: " + ingredient['name'] + "\n" + 
@@ -171,9 +178,12 @@ function processStatesAndEdges(ingredients, instructions) {
 
   for(i = 0; i < instructions.length; i++) {
     instructions[i]['keyword'] = instructions[i]['keyword'].toUpperCase();
-    instruction = instructions[i]
-  //  states['instr'+i] = { 
-    
+    instruction = instructions[i];
+    if(seenBeforeInstrTotal[instruction['keyword']]) {
+      seenBeforeInstrTotal[instruction['keyword']] += 1;
+    } else {
+      seenBeforeInstrTotal[instruction['keyword']] = 1;
+    }
     var input = instruction['keyword'];
     if (seenBefore[input]) {
       seenBefore[instruction['keyword']] += 1;
@@ -185,9 +195,6 @@ function processStatesAndEdges(ingredients, instructions) {
       description : instruction['text']
     };
   }
-
-
-
 
   // Set up the edges
   for(i = 0; i < instructions.length; i++) {
@@ -242,7 +249,6 @@ function processStatesAndEdges(ingredients, instructions) {
     }
   }
   return [states, edges];
-
 }
 
 
@@ -288,6 +294,13 @@ ProgressModel.startLoad(function(error, jsonResults) {
         maxState = [states1, edges1];
       }
     }
+    var freqIngr = [];
+    for(key in seenBeforeIngrTotal) freqIngr.push({key: key, freq: seenBeforeIngrTotal[key]});
+    freqIngr.sort(function(a,b){return b.freq - a.freq})
+    var freqInstr = [];
+    for(key in seenBeforeInstrTotal) freqInstr.push({key: key, freq: seenBeforeInstrTotal[key]});
+    freqInstr.sort(function(a,b){return b.freq - a.freq});
+
     finalResults = tsne(finalResults);
 
     for(var i = 0; i < finalResults.length;i++) {
@@ -302,12 +315,12 @@ ProgressModel.startLoad(function(error, jsonResults) {
         finalResults[i].marker = {fillColor: 'red'};
       }
     } 
-    console.log(finalResults);
+    
     recipeChartView.render(finalResults);
 
     window.sessionStorage.setItem('currSearch', JSON.stringify(currSearch) );
 
-    GraphRenderer.render(minIndex);
+    GraphRenderer.render(minIndex, freqIngr, freqInstr);
   });
 });
 
