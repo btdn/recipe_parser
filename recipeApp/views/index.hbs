@@ -40,6 +40,8 @@ link rel="stylesheet" href="./stylesheets/demo.css">
 <link rel="stylesheet" href="/stylesheets/tipsy.css">
 <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
 <script src="/javascripts/tipsy.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.js"></script>
+
 <style id="css">
 text {
   font-weight: 300;
@@ -239,16 +241,22 @@ text {
 									  <th>Frequency</th>
 									</tr>
 								</thead>
-								<tbody>
-								<!--	<script type="text/x-handlebars-template" id="top5_template">
-										{{#each data}}
-										<tr>
-									  		<th scope="row">1</th>
-									  		<td>{{this.key}}</td>
-									  		<td>{{this.frequency}}</td>
-										</tr>
-										{{/each}}
-									<script> -->
+								<script id="top5_template" type="text/x-handlebars-template">
+								{{#each results}}
+								<tr>
+							  		<th scope="row">{{@index}}</th>
+							  		<td>{{freq}}</td>
+							  		<td>{{anger}}</td>
+							  		<td>{{results}}</td>
+							  		{{this.results}}
+							  		{{this.anger}}
+							  		{{this.key}}
+							  		{{this.freq}}
+
+								</tr>
+								{{/each}} 
+								</script> 
+								<tbody id="top5_content">
 								</tbody>
 							</table>
 						</div>
@@ -361,6 +369,10 @@ text {
 				}
 			}
 		</script>
+
+	<!-- HANDLEBARS TEMPLATES -->
+
+
 	<!-- Bootstrap Core javascripts --> 
 		<script src="https://code.highcharts.com/highcharts.js"></script>
 		<script src="https://code.highcharts.com/modules/exporting.js"></script>

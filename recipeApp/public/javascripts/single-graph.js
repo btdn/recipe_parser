@@ -18,8 +18,6 @@ var recognizeAssociations = {
 
 var branchSet = {};
 var nodeList = [];
-var seenBeforeIngrTotal = {};
-var seenBeforeInstrTotal = {};
 
 
 
@@ -155,7 +153,7 @@ function getRecentNode(keyWord) {
   return mostRecentNode;
 }
 
-function processStatesAndEdges(ingredients, instructions) {
+function processStatesAndEdges(ingredients, instructions, seenBeforeIngrTotal, seenBeforeInstrTotal) {
   nodeList = []
   var states = {};
   var seenBeforeIngr = {};
@@ -202,16 +200,16 @@ function processStatesAndEdges(ingredients, instructions) {
     associatedIngrs = associatedIngrs.filter(function(item, pos) {
       return associatedIngrs.indexOf(item) == pos;
     });
+    //iterate through ingredients associated with instructions
     for(j = 0; j < associatedIngrs.length; j++) {
       var ingr = associatedIngrs[j];
-      if (ingr < ingredients.length) {
-      //  g.setEdge("ingr"+ingr, "instr"+i, { label: "" });
-          if(seenBeforeIngr[ingredients[ingr]['name']]) {
+      if (ingr < ingredients.length) { //set up ingredient -> instruction edges
+          if(seenBeforeIngr[ingredients[ingr]['name']]) { //connects this special case to the most recently
+            //used node connected to the associated ingredient
             seenBeforeIngr[ingredients[ingr]['name']] += 1;
             var mostRecent = getRecentNode(ingredients[ingr]['name']);
             mostRecentNode = mostRecent;
             if (mostRecent != instructions[i]['keyword']) {
-         //     g.setEdge(mostRecent, instructions[i]['keyword'], { label: "" });
               addToNodeList(mostRecent, instructions[i]['keyword'], false); 
               if (edges[mostRecent] && edges[mostRecent].length == 0) {
                 edges[mostRecent].push(instructions[i]['keyword']);
@@ -219,11 +217,8 @@ function processStatesAndEdges(ingredients, instructions) {
                 edges[mostRecent] = [instructions[i]['keyword']];
               }  
             }
-            
-          } else {
-         //   if (!edges[instructions[i]['keyword']]) {
+          } else { //connect directly to the ingredient itself
               seenBeforeIngr[ingredients[ingr]['name']] = 1;
-        //      g.setEdge(ingredients[ingr]['name'], instructions[i]['keyword'], { label: "" });
               addToNodeList(ingredients[ingr]['name'], instructions[i]['keyword'], true); 
               mostRecentNode = instructions[i]['keyword'];
               if (edges[ingredients[ingr]['name']] && edges[ingredients[ingr]['name']].length == 0) {
@@ -231,12 +226,9 @@ function processStatesAndEdges(ingredients, instructions) {
               } else {
                 edges[ingredients[ingr]['name']] = [instructions[i]['keyword']];
               }
-        //    }  
           }      
-      } else {
-     //   g.setEdge("instr"+(i-1), "instr"+i, { label: "" }); 
+      } else { //set up instruction -> instruction edges...
         if (!edges[instructions[i]['keyword']]) {
-     //     g.setEdge(instructions[i-1]['keyword'], instructions[i]['keyword'], { label: "" });
           addToNodeList(instructions[i-1]['keyword'], instructions[i]['keyword'], false); 
           if (edges[instructions[i-1]['keyword']] && edges[instructions[i-1]['keyword']].length == 0) {
             edges[instructions[i-1]['keyword']].push(instructions[i]['keyword']);
@@ -253,9 +245,12 @@ function processStatesAndEdges(ingredients, instructions) {
 
 
 ProgressModel.startLoad(function(error, jsonResults) {
+  var seenBeforeIngrTotal = {};
+  var seenBeforeInstrTotal = {};
   $("#searchSize").text(jsonResults['data'].length);
   var finalResults = [];
-  $.getJSON("javascripts/moo.json", function(jsonCurr) {
+  $.getJSON("javascripts/moo.json", function(jsonCurr) { //json containing all word2vec similarity
+    //scores of the cooking verbs
     var min = 100000000000000000000000000;
     var max = 0;
     var maxState = [];
@@ -266,19 +261,19 @@ ProgressModel.startLoad(function(error, jsonResults) {
     for(var i = 0; i < jsonResults['data'].length; i++) {
       var ingredients1 = jsonResults['data'][i][1];
       var instructions1 = jsonResults['data'][i][0];
-      var packed1 = processStatesAndEdges(ingredients1, instructions1);
+      var packed1 = processStatesAndEdges(ingredients1, instructions1, seenBeforeIngrTotal, seenBeforeInstrTotal);
       var states1 = packed1[0];
       var edges1 = packed1[1];
       currSearch.push([states1, edges1]);
+    }
+
+    for(var i = 0; i < jsonResults['data'].length; i++) {
+      var edges1 = currSearch[i][1];
       var vertices1 = topologicalSort(edges1);
       var counter = 0;
       finalResults.push([]);
       for(var j = 0; j < jsonResults['data'].length; j++) {
-        var ingredients2 = jsonResults['data'][j][1];
-        var instructions2 = jsonResults['data'][j][0];
-        var packed2 = processStatesAndEdges(ingredients2, instructions2);
-        var states2 = packed2[0];
-        var edges2 = packed2[1];
+        var edges2 = currSearch[j][1];
         var vertices2 = topologicalSort(edges2);
         var count = levenshteinDistance(vertices1, vertices2, jsonCurr);
         counter += count;
@@ -294,6 +289,7 @@ ProgressModel.startLoad(function(error, jsonResults) {
         maxState = [states1, edges1];
       }
     }
+    
     var freqIngr = [];
     for(key in seenBeforeIngrTotal) freqIngr.push({key: key, freq: seenBeforeIngrTotal[key]});
     freqIngr.sort(function(a,b){return b.freq - a.freq})
@@ -304,8 +300,6 @@ ProgressModel.startLoad(function(error, jsonResults) {
     finalResults = tsne(finalResults);
 
     for(var i = 0; i < finalResults.length;i++) {
-      finalResults[i][0] *= Math.pow(10, 14);
-      finalResults[i][1] *= Math.pow(10, 14);
       finalResults[i] = {
         id: i,
         x:  finalResults[i][0],
@@ -315,7 +309,6 @@ ProgressModel.startLoad(function(error, jsonResults) {
         finalResults[i].marker = {fillColor: 'red'};
       }
     } 
-    
     recipeChartView.render(finalResults);
 
     window.sessionStorage.setItem('currSearch', JSON.stringify(currSearch) );

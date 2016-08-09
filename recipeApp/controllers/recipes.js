@@ -8,6 +8,9 @@ var con = mysql.createConnection({
   'database': 'mysql',
 });
 
+//edit this...can be up to 300 chocolate chip cookie recipes
+var dataSize = '50';
+
 //Establishing mysql connection
 con.connect(function(err){
   if(err){
@@ -60,7 +63,6 @@ function getInstruction(recipe, ingredients) {
 	for (var key in recipe) {
   		if (recipe.hasOwnProperty(key)) {
     		var nodes = recipe[key]['nodes'];
-    		console.log(key);
     		if(nodes == undefined) continue;
     		var text_line = recipe[key]['text_line'];
     		var lastInsert = -1;
@@ -75,8 +77,6 @@ function getInstruction(recipe, ingredients) {
     			} else {
     				if (lastInsert != -1) {
     					instruction[lastInsert]['associatedIngr'] = instruction[lastInsert]['associatedIngr'].concat(findAssocIngr(ingredients, node.text));
-    					console.log("HELLMAN's");
-    					console.log(instruction[lastInsert]['associatedIngr']);
     				} else {
     					var lastInsert = 0;
     					instruction.push({'text': text_line, 'keyword': node.text, 'associatedIngr': findAssocIngr(ingredients, node.text)});
@@ -93,7 +93,6 @@ function getInstruction(recipe, ingredients) {
 
 exports.get_recipes = function (req, res) {
 	recipe_data['percent_complete'] = recipe_data['data'].length/num_recipes;
-	console.log(recipe_data);
 	res.send(JSON.stringify(recipe_data)); 
 }
 
@@ -101,7 +100,13 @@ exports.get_recipes = function (req, res) {
 exports.recipes = function (req, res) {
   //Drawing information from the database for later parsing
 	recipes = {}
-	con.query('SELECT DISTINCT * FROM recipes where type="cookie" LIMIT 50',function(err,rows){
+	if(recipe_data['percent_complete']) {
+		if(recipe_data['percent_complete'] >= 1.0) {
+			res.send("data already extracted");
+			return;
+		}
+	}
+	con.query('SELECT DISTINCT * FROM recipes where type="cookie" LIMIT ' + dataSize,function(err,rows){
   		if(err) throw err;
   		for (i = 0; i < rows.length; i++) {
     		row = rows[i];
@@ -117,8 +122,6 @@ exports.recipes = function (req, res) {
 	        		if(errS) throw errS;
 	        		if (rowsS.length == 0) return;
 	        		var recipe_id = rowsS[0].recipe_id;
-	        		console.log("RECIPE: " + recipe_id)
-	        		console.log("STEPS: " + rowsS)
 	        		//put this into an ingredient array
 	        		function recursiveSteps(i, recipe_id, step_id, rowsS) {
 	        			if (i < 0) {
@@ -126,7 +129,6 @@ exports.recipes = function (req, res) {
 	        				var newInstruction = []
 	        				for(j=0;j<recipes[recipe_id]['ingredients'].length;j++) {
 	        					ingredient = recipes[recipe_id]['ingredients'][j]
-	        					console.log(ingredient)
 	        					newIngredient.push({'name':ingredient.text_name, 'amount': 1, 'metric': 'cup'});
 	        				}
 	        				var newInstruction = getInstruction(recipes[recipe_id], newIngredient);
@@ -142,7 +144,6 @@ exports.recipes = function (req, res) {
 		           						return a.rank - b.rank;
 		           					});
 		           					var step_id = rowsN[0].step_id
-		           					console.log("NODES of step_id "+step_id+": " + rowsN); 
 		           					recipes[recipe_id][step_id]['nodes'] = rowsN;
 	           					}
 	           					var newInstruction = recursiveSteps(i - 1, recipe_id, step_id, rowsS);
@@ -151,10 +152,9 @@ exports.recipes = function (req, res) {
 	          			}
 	        		}
 	        		console.log(recursiveSteps(rowsS.length-1, recipe_id, -1, rowsS) ); 
-
 	    		}); 
 	    	});
   		}
 	});
-	res.send("STARTED IT UP YO");
+	res.send("started up");	
 };
