@@ -5,6 +5,7 @@
 	var colorGradientS = ['#B8D3E0', '#94BDD1', '#70A7C2', '#4D90B2'];
 	var ingrFreq = null;
 	var instrFreq = null;
+	var graphIndex = "#first";
 
 	function calculateHex(keyword, ingrFlag, ingr, instr) {
 		if(ingr) {
@@ -85,8 +86,8 @@
 	    // Create the renderer
 	    var render = new dagreD3.render();
 	    // Set up an SVG group so that we can translate the final graph.
-	    $("#first").html('');
-	    var svg = d3.select("#first"),
+	    $(graphIndex).html('');
+	    var svg = d3.select(graphIndex),
 	        inner = svg.append("g");
 	    // Set up zoom support
 	    var zoom = d3.behavior.zoom().on("zoom", function() {

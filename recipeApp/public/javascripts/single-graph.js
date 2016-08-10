@@ -1,31 +1,11 @@
-// Create a new directed graph
-var g = new dagreD3.graphlib.Graph().setGraph({});
 
-//Create a second directed graph
-var g1 = new dagreD3.graphlib.Graph().setGraph({});
 
-//Create a common edges and states graph
-var g2 = new dagreD3.graphlib.Graph().setGraph({});
 
-var recognizeAssociations = {
-  'dough' : ['flour'],
-  'sandwich' : ['bread'],
-  'toast' : ['bread'],
-  'slice' : ['bread', 'roll'],
-  'dry' : ['flour', 'salt', 'powder'],
-  'wet' : ['egg', 'butter'],
-};
 
-var branchSet = {};
 var nodeList = [];
-
-
 
 var mostRecentNode = '';
 
-var test1 = ["semisweet chocolate", "orange zest", "pecan", "oat", "clove", "nutmeg", "cinnamon", "baking soda", "flour", "egg", "vanilla extract", "salt", "brown sugar", "sugar", "butter", "PREHEAT", "LINE", "BEAT", "ADD", "BEAT2", "STIR", "SIFT", "ADD2", "FLOUR", "ADD3", "STIR2", "DROP", "BAKE", "REMOVE", "COOL", "STORE"];
-var test2 = ["bittersweet chocolate", "semisweet chocolate", "vanilla extract", "egg", "brown sugar", "sugar", "butter", "salt", "baking soda", "flour", "baking sheets; paper equipment: parchment special", "POSITION", "PREHEAT", "LINE", "SIFT", "COMBINE", "BEAT", "ADD", "BEAT2", "ADD2", "ADD3", "FOLD", "COVER", "WRAP", "CHILL", "DROP", "BAKE", "LOWER", "COOL", "COOL2", "CONTINUE"];
-var test3 = ["scant bar butterfinger candy", "bittersweet semisweet chocolate", "vanilla extract", "egg", "brown sugar", "sugar", "butter", "butter peanut", "salt", "baking powder", "flour", "PREHEAT", "LINE", "WHISK", "BLEND", "BEAT", "BEAT2", "STIR", "PLACE", "ROLL", "FORM", "ROLL2", "PRESS", "BAKE", "TRANSFER", "COOL"]
 function isUppercase(word) {
   return (word === word.toUpperCase()); 
 }
@@ -289,7 +269,7 @@ ProgressModel.startLoad(function(error, jsonResults) {
         maxState = [states1, edges1];
       }
     }
-    
+
     var freqIngr = [];
     for(key in seenBeforeIngrTotal) freqIngr.push({key: key, freq: seenBeforeIngrTotal[key]});
     freqIngr.sort(function(a,b){return b.freq - a.freq})
