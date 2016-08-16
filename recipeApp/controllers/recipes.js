@@ -8,7 +8,7 @@ var con = mysql.createConnection({
   'database': 'mysql',
 });
 
-//edit this...can be up to 300 chocolate chip cookie recipes
+//edit this...can be up to 300 chocolate chip cookies
 var dataSize = '50';
 
 //Establishing mysql connection
@@ -111,7 +111,8 @@ exports.recipes = function (req, res) {
   		for (i = 0; i < rows.length; i++) {
     		row = rows[i];
     		num_recipes = rows.length;
-	    	recipes[row.id] = {}
+	    	recipes[row.id] = {};
+	    	recipes[row.id]['name'] = row.recipe_name;
 	    	con.query('SELECT * FROM ingredients WHERE recipe_id=' + row.id ,function(errI,rowsI) {
 	      		if(errI) throw errI;
 	      		if (rowsI.length == 0) return;
@@ -132,7 +133,7 @@ exports.recipes = function (req, res) {
 	        					newIngredient.push({'name':ingredient.text_name, 'amount': 1, 'metric': 'cup'});
 	        				}
 	        				var newInstruction = getInstruction(recipes[recipe_id], newIngredient);
-	        				recipe_data['data'].push([newInstruction, newIngredient, recipe_id]);
+	        				recipe_data['data'].push([newInstruction, newIngredient, recipes[recipe_id]['name']]);
 	        			} else {	        			
 	          				rowS = rowsS[i]
 	          				console.log("We're on step " + i + " recipe_id " + recipe_id + "whose text is " + rowS.text_line)

@@ -43,7 +43,7 @@ $(function () {
                     marker: {
                         states: {
                             select: {
-                                fillColor: 'red',
+                                fillColor: 'blue',
                                 lineWidth: 0
                             }
                         }
@@ -78,6 +78,14 @@ $(function () {
                 data: currData,
                 point: {
                     events: {
+                        click: function() {
+                            this.setState("select");
+                            this.update({
+                              marker:{
+                                  fillColor:'blue',
+                              }
+                            });
+                        },
                         select: function(event) {
                             var id = event.target.id;
                             GraphRenderer.render(id);

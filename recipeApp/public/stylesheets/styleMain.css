@@ -1,0 +1,74 @@
+.recipeHeader {
+	padding-bottom: 20px;
+	font-family: Raleway;
+}
+
+ul{
+	list-style-type: none;
+    margin: 0;
+    padding: 0;
+   }
+
+
+ li {
+    margin: 0;
+    padding: 0;
+    padding-top:10px;
+    padding-bottom:10px;
+    padding-left:10px;
+    margin-bottom:5px;
+    margin-top:5px;
+  }
+
+  .recipeList {
+    border: 1px solid gray;
+    background-color: #add8e6;
+  }
+
+  .recipeList:hover {
+    background-color: #9bc2cf;
+  }
+
+ .ingredientNO {
+ 	border: 1px solid red;
+ }
+
+  .actionNO {
+ 	border: 1px solid #8B0000;
+ }
+
+
+ .ingredientYES {
+ 	border: 1px solid #66CD00;
+ }
+
+  .actionYES {
+ 	border: 1px solid #006400;
+ }
+
+ .btnNO {
+ 	@include button-variant(red, white, blue);
+ }
+
+ .btnYES {
+ 	background-color: #66CD00;
+ }
+
+.onclickingredientYES {
+	background-color: #98FB98;
+}
+
+.onclickingredientNO {
+	background-color: #FF7F50;
+}
+
+.onclickactionYES {
+	background-color: #147614;
+}
+
+.onclickactionNO {
+	background-color: #CD5B45;
+}
+
+
+

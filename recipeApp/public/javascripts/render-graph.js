@@ -5,7 +5,8 @@
 	var colorGradientS = ['#B8D3E0', '#94BDD1', '#70A7C2', '#4D90B2'];
 	var ingrFreq = null;
 	var instrFreq = null;
-	var graphIndex = "#first";
+	var graphIndex = true;
+	var inners = [];
 
 	function calculateHex(keyword, ingrFlag, ingr, instr) {
 		if(ingr) {
@@ -49,16 +50,38 @@
 		if(ingr) {
 			var ingrArr = ingr.splice(0,5);
 			var top5Template = Handlebars.compile($("#top5_template").html());
+			debugger;
+			console.log(ingrArr);
+			var test = top5Template("yooo");
+			console.log(test);
 			$("#top5_content").html(top5Template({results: ingrArr}));	
 		}	
 	}
 
 	GraphRenderer.render = function(index, ingrFreq, instrFreq) {
-		var g = new dagreD3.graphlib.Graph().setGraph({});	
+		var pairs = JSON.parse(window.sessionStorage.getItem('pairs'));
+		var pairIndex = window.sessionStorage.getItem('currGraphIndex');
+		pairIndex = parseInt(pairIndex);
+		if(pairIndex >= pairs.length) {
+			return;
+		}
+		
+		var rowIndex = pairs[pairIndex][0];
+		var colIndex = pairs[pairIndex][1];
+		console.log(rowIndex);
+		console.log(colIndex);
+		if(!graphIndex) {
+			sessionStorage.setItem('currGraphIndex', pairIndex + 1);
+		}
+		var g = new dagreD3.graphlib.Graph({compound:true}).setGraph({});	
 		var currGraph = window.sessionStorage.getItem('currSearch');
 		currGraph = JSON.parse(currGraph);
 		var edges = currGraph[index][1];
 		var states = currGraph[index][0];
+		var clusters = currGraph[index][2];
+		var recipe_name = currGraph[index][3];
+
+		console.log(clusters);
 		updateTop5(ingrFreq, instrFreq);
 	    Object.keys(states).forEach(function(state) {
 	      var flag=false;
@@ -69,13 +92,19 @@
 	      	flag = true;
 	      }
 	      var hex = calculateHex(value.label, flag, ingrFreq, instrFreq);
-	      console.log(value.label);
-	      console.log(flag);
-	      console.log(hex);
 	      value.style = "fill: " +  hex;
 	      value.rx = value.ry = 5;
 	      g.setNode(state, value);
 	    });
+
+	    for(key in clusters) {
+			g.setNode(key+"GROUP", {label: '', clusterLabelPos: 'top', style: 'fill: #d3d7e8'});
+			var associated = clusters[key];
+			g.setParent(key, key+"GROUP");
+			for(var i = 0; i < associated.length;i++) {
+				g.setParent(associated[i], key+"GROUP");
+			}
+		}
 	      // Add states to the graph, set labels, and style
 	    for(key in edges) {
 	      var secondEdges = edges[key];
@@ -86,14 +115,36 @@
 	    // Create the renderer
 	    var render = new dagreD3.render();
 	    // Set up an SVG group so that we can translate the final graph.
-	    $(graphIndex).html('');
-	    var svg = d3.select(graphIndex),
-	        inner = svg.append("g");
+	    var selector = "#first";
+	    if (graphIndex) {
+	    	graphIndex = false;
+	    } else {
+	    	$("#row"+rowIndex).append('<div class="col-md-4 parent-closed"><div class="panel panel-widget"><div class="panel-title" style="font-size:7pt">'+recipe_name+'<ul class="panel-tools"><li><input id="'+'Check'+index+'" type="checkbox"></li><li><a id="closed'+index+'" class="icon closed-tool"><i class="fa fa-times"></i></a></li></ul></div><svg id="'+'Panel'+index+'" style="width: 100%; height: 350px"></svg></div></div>');
+	    	selector = "#" + "Panel" + index;
+	    }
+	    $(document).ready(function(){
+		  $(".panel-tools .closed-tool").click(function(event){
+		  	$(this).parents(".parent-closed").html('');
+		  	RenderClosed.render();
+		  });
+		}); 
+	    $(selector).html('');
+	    var svg = d3.select(selector);
+	    var inner = svg.append("g");
+	    inners.push([inner, index]);
 	    // Set up zoom support
 	    var zoom = d3.behavior.zoom().on("zoom", function() {
-	        inner.attr("transform", "translate(" + d3.event.translate + ")" +
-	                                    "scale(" + d3.event.scale + ")");
-	      });
+	    	inner.attr("transform", "translate(" + d3.event.translate + ")" +
+	            "scale(" + d3.event.scale + ")");
+	    	for(var i = 0; i < inners.length; i++) {
+	    		var inner1 = inners[i][0];
+	    		var index = inners[i][1];
+	    		if($("#Check"+index).is(":checked")) {
+	    			inner1.attr("transform", "translate(" + d3.event.translate + ")" +
+	                "scale(" + d3.event.scale + ")");
+	    		}
+	    	}
+	    });
 	    svg.call(zoom);
 	    // Simple function to style the tooltip for the given node.
 	    var styleTooltip = function(name, description) {
@@ -112,12 +163,6 @@
 	      .event(svg);
 	    svg.attr('height', g.graph().height * initialScale + 40);
 	    // Set up zoom support
-	    var zoom = d3.behavior.zoom().on("zoom", function() {
-	        inner.attr("transform", "translate(" + d3.event.translate + ")" +
-	                                    "scale(" + d3.event.scale + ")");
-	    });
-	    svg.call(zoom);
-	    svg.attr('height', g2.graph().height * initialScale + 40);
 	};
 	window.GraphRenderer = GraphRenderer;
 })();
