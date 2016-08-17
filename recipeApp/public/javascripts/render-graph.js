@@ -80,8 +80,15 @@
 		var states = currGraph[index][0];
 		var clusters = currGraph[index][2];
 		var recipe_name = currGraph[index][3];
-
-		console.log(clusters);
+		var justText = currGraph[index][4];
+		var textIndexes = currGraph[index][5];
+		var formatString = "";
+		for(var i = 0; i < justText.length; i++) {
+			formatString += "<li id='text"+index+"-"+i+"' style='padding: 0px;'>";
+			formatString += justText[i];
+			formatString += "</li>";
+		}
+		
 		updateTop5(ingrFreq, instrFreq);
 	    Object.keys(states).forEach(function(state) {
 	      var flag=false;
@@ -119,7 +126,7 @@
 	    if (graphIndex) {
 	    	graphIndex = false;
 	    } else {
-	    	$("#row"+rowIndex).append('<div class="col-md-4 parent-closed"><div class="panel panel-widget"><div class="panel-title" style="font-size:7pt">'+recipe_name+'<ul class="panel-tools"><li><input id="'+'Check'+index+'" type="checkbox"></li><li><a id="closed'+index+'" class="icon closed-tool"><i class="fa fa-times"></i></a></li></ul></div><svg id="'+'Panel'+index+'" style="width: 100%; height: 350px"></svg></div></div>');
+	    	$("#row"+rowIndex).append('<div class="col-md-3 parent-closed" style="padding:0px; margin-bottom:0px"><div class="panel panel-widget" style="margin-bottom:0px;"><div class="panel-title truncate" style="font-size:7pt">'+recipe_name+'<ul class="panel-tools"><li><input id="'+'Check'+index+'" type="checkbox"></li><li><a id="closed'+index+'" class="icon closed-tool"><i class="fa fa-times"></i></a></li></ul></div><div class="row"><div class="col-md-8"><svg id="'+'Panel'+index+'" style="width: 100%; height: 350px"></svg></div><div class="col-md-4" style="padding: 0px; overflow: scroll; height: 350px; word-wrap: break-word; font-size: 6pt">'+formatString+'</div></div></div></div>');
 	    	selector = "#" + "Panel" + index;
 	    }
 	    $(document).ready(function(){
@@ -154,7 +161,9 @@
 	    render(inner, g);
 	    inner.selectAll("g.node")
 	      .attr("title", function(v) { return styleTooltip(v, g.node(v).description) })
-	      .each(function(v) { $(this).tipsy({ gravity: "w", opacity: 1, html: true }); });
+	  //    .attr("id", function(d, i){ console.log(index); var result = 'index'+index+'-'+textIndexes[i]; return result; })
+	  	  .each(function(v) { $(this).attr('id',  'index'+index+'-'+textIndexes[v]); })
+	      .each(function(v) { $(this).tipsy({ gravity: "w", opacity: 1, html: true }); $(this).hover(function(){ var numberPattern = /\d+/g; var nums = this.id.match(numberPattern); $("#text"+nums[0]+"-"+nums[1]).toggleClass("backHover");}); });
 	    // Center the graph
 	    var initialScale = 0.25;
 	    zoom

@@ -139,7 +139,12 @@
     var edges = {};
     var clusters = {};
     var seenBefore = {};
-    for(i = 0; i < ingredients.length; i++) {
+    console.log(instructions);
+    var justText = [];
+    var textIndexes = {};
+    var textIndex = 0;
+    
+    for(var i = 0; i < ingredients.length; i++) {
       ingredient = ingredients[i]
       if(seenBeforeIngrTotal[ingredient['name']]) {
         seenBeforeIngrTotal[ingredient['name']] += 1;
@@ -174,6 +179,20 @@
         description : instruction['text']
       };
     }
+
+    justText.push(instructions[0]['text'].trim());
+    textIndexes[instructions[0]['keyword']] = 0;
+    for(var i = 1; i < instructions.length; i++) {
+      if(instructions[i]['text'] !== instructions[i-1]['text']) {
+        justText.push(instructions[i]['text'].trim());
+        textIndex += 1;
+      } 
+      console.log(instructions[i]['keyword']);
+      textIndexes[instructions[i]['keyword']] = textIndex;
+    }
+    console.log(instructions);
+    console.log(justText);
+    console.log(textIndexes);
 
     // Set up the edges
     for(i = 0; i < instructions.length; i++) {
@@ -226,12 +245,11 @@
         }
       }
     }
-    return [states, edges, clusters];
+    return [states, edges, clusters, justText, textIndexes];
   }
 
 
   RenderInstance.render = function(jsonResults) {
-    console.log(jsonResults);
     var seenBeforeIngrTotal = {};
     var seenBeforeInstrTotal = {};
     $("#searchSize").text(jsonResults['data'].length);
@@ -252,8 +270,10 @@
         var packed1 = processStatesAndEdges(ingredients1, instructions1, seenBeforeIngrTotal, seenBeforeInstrTotal);
         var states1 = packed1[0];
         var edges1 = packed1[1];
-        var clusters1 = packed1[2]
-        currSearch.push([states1, edges1, clusters1, recipe_name]);
+        var clusters1 = packed1[2];
+        var justText = packed1[3];
+        var textIndexes = packed1[4];
+        currSearch.push([states1, edges1, clusters1, recipe_name, justText, textIndexes]);
       }
 
       for(var i = 0; i < jsonResults['data'].length; i++) {
@@ -270,12 +290,12 @@
         }
         if(counter < min) {
           min = counter;
-          minState = [states1, edges1, clusters1];
+          minState = [states1, edges1, clusters1, justText];
           minIndex = i;
         }
         if(counter > max) {
           max = counter;
-          maxState = [states1, edges1, clusters1];
+          maxState = [states1, edges1, clusters1, justText];
         }
       }
 
@@ -302,8 +322,8 @@
 
       window.sessionStorage.setItem('currSearch', JSON.stringify(currSearch) );
       var pairs = [];
-      for(var i = 1; i < 4; i++) {
-        for(var j = 1; j < 4; j++) {
+      for(var i = 1; i < 5; i++) {
+        for(var j = 1; j < 5; j++) {
           pairs.push([i, j]);
         }
       }

@@ -40,6 +40,18 @@ ul,label{
 body a:hover{
 	text-decoration:none;
 }
+
+.truncate {
+  width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+}
+
+.backHover {
+  background-color: #ADD8E6;
+}
 .main-content {
     position: relative;
 }
