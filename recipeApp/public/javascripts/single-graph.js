@@ -301,6 +301,7 @@
 
       var freqIngr = [];
       for(key in seenBeforeIngrTotal) freqIngr.push({key: key, freq: seenBeforeIngrTotal[key]});
+      $("#totalIngredients").text(Object.keys(seenBeforeIngrTotal).length);
       freqIngr.sort(function(a,b){return b.freq - a.freq})
       var freqInstr = [];
       for(key in seenBeforeInstrTotal) freqInstr.push({key: key, freq: seenBeforeInstrTotal[key]});

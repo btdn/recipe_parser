@@ -170,7 +170,7 @@ text {
 			
 				<!-- four-grids -->
 				<div class="row four-grids">
-					<div class="col-md-3 ticket-grid">
+					<div class="col-md-6 ticket-grid">
 						<div class="tickets">
 							<div class="grid-left">
 								<div class="book-icon">
@@ -184,35 +184,7 @@ text {
 							<div class="clearfix"> </div>
 						</div>
 					</div>
-					<div class="col-md-3 ticket-grid">
-						<div class="tickets">
-							<div class="grid-left">
-								<div class="book-icon">
-									<i class="fa fa-rocket"></i>
-								</div>
-							</div>
-							<div class="grid-right">
-								<h3>New <span>Projects</span></h3>
-								<p>745</p>
-							</div>
-							<div class="clearfix"> </div>
-						</div>
-					</div>
-					<div class="col-md-3 ticket-grid">
-						<div class="tickets">
-							<div class="grid-left">
-								<div class="book-icon">
-									<i class="fa fa-bar-chart"></i>
-								</div>
-							</div>
-							<div class="grid-right">
-								<h3>Our <span>Status</span></h3>
-								<p>125</p>
-							</div>
-							<div class="clearfix"> </div>
-						</div>
-					</div>
-					<div class="col-md-3 ticket-grid">
+					<div class="col-md-6 ticket-grid">
 						<div class="tickets">
 							<div class="grid-left">
 								<div class="book-icon">
@@ -220,8 +192,8 @@ text {
 								</div>
 							</div>
 							<div class="grid-right">
-								<h3>Daily <span>Visitors</span></h3>
-								<p>7462</p>
+								<h3>Total <span>Ingredients</span></h3>
+								<p id="totalIngredients"></p>
 							</div>
 							<div class="clearfix"> </div>
 						</div>
@@ -244,8 +216,13 @@ text {
 									</tr>
 								</thead>
 								<script id="top5_template" type="text/x-handlebars-template">
-								<span>yo</span>
-								{{this}} 
+								{{#each results}}
+									<tr>
+									<th scope="row">{{@index}}</th>
+									<td>{{this.key}}</td>
+									<td>{{this.freq}}</td>
+									</tr>
+								{{/each}}
 								</script> 
 								<tbody id="top5_content"></tbody>
 							</table>
@@ -256,35 +233,16 @@ text {
 					<div class="col-md-6">
 						<div class="panel panel-widget">
 								<div class="tables">
-								<h4>Basic Table:</h4>
+								<h4>Top 5 Actions:</h4>
 								<table class="table">
 									<thead>
 										<tr>
-										  <th>#</th>
-										  <th>First Name</th>
-										  <th>Last Name</th>
-										  <th>Username</th>
+									  <th>#</th>
+									  <th>Action Name</th>
+									  <th>Frequency</th>
 										</tr>
 									</thead>
-									<tbody>
-										<tr>
-										  <th scope="row">1</th>
-										  <td>Mark</td>
-										  <td>Otto</td>
-										  <td>@mdo</td>
-										</tr>
-										<tr>
-										  <th scope="row">2</th>
-										  <td>Jacob</td>
-										  <td>Thornton</td>
-										  <td>@fat</td>
-										</tr>
-										<tr>
-										  <th scope="row">3</th>
-										  <td>Larry</td>
-										  <td>the Bird</td>
-										  <td>@twitter</td>
-										</tr>
+									<tbody id="top5_content_action">
 									</tbody>
 								</table>
 							</div>
@@ -382,6 +340,7 @@ text {
 		<!--//scrolling js-->
 		<script src="/javascripts/controllers-client/progress.js"></script>
 		<script src="/javascripts/render-closed.js"></script>
+		<script src="/javascripts/multigraph-render.js"></script>
 		<script src="/javascripts/render-graph.js"></script>
 		<script src="/javascripts/tsne.js"></script>
 		<script src="/javascripts/single-graph.js"></script>

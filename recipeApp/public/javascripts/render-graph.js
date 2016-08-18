@@ -49,12 +49,14 @@
 	function updateTop5(ingr, instr) {
 		if(ingr) {
 			var ingrArr = ingr.splice(0,5);
+			var instrArr = instr.splice(0,5);
 			var top5Template = Handlebars.compile($("#top5_template").html());
 			debugger;
 			console.log(ingrArr);
 			var test = top5Template("yooo");
 			console.log(test);
-			$("#top5_content").html(top5Template({results: ingrArr}));	
+			$("#top5_content").html(top5Template({results: ingrArr}));
+			$("#top5_content_action").html(top5Template({results: instrArr}));	
 		}	
 	}
 
@@ -126,8 +128,9 @@
 	    if (graphIndex) {
 	    	graphIndex = false;
 	    } else {
-	    	$("#row"+rowIndex).append('<div class="col-md-3 parent-closed" style="padding:0px; margin-bottom:0px"><div class="panel panel-widget" style="margin-bottom:0px;"><div class="panel-title truncate" style="font-size:7pt">'+recipe_name+'<ul class="panel-tools"><li><input id="'+'Check'+index+'" type="checkbox"></li><li><a id="closed'+index+'" class="icon closed-tool"><i class="fa fa-times"></i></a></li></ul></div><div class="row"><div class="col-md-8"><svg id="'+'Panel'+index+'" style="width: 100%; height: 350px"></svg></div><div class="col-md-4" style="padding: 0px; overflow: scroll; height: 350px; word-wrap: break-word; font-size: 6pt">'+formatString+'</div></div></div></div>');
+	    	$("#row"+rowIndex).append('<div class="col-md-3 parent-closed" style="padding:0px; margin-bottom:0px"><div class="panel panel-widget" style="margin-bottom:0px;"><div class="panel-title truncate" style="font-size:7pt">'+recipe_name+'<ul class="panel-tools"><li><input id="'+'Check'+index+'" type="checkbox"></li><li><a id="closed'+index+'" class="icon closed-tool"><i class="fa fa-times"></i></a></li></ul></div><div class="row"><div class="col-md-4" style="padding: 0px; overflow: scroll; height: 350px; word-wrap: break-word; font-size: 6pt">'+formatString+'</div><div class="col-md-8"><svg id="'+'Panel'+index+'" style="width: 100%; height: 350px"></svg></div></div></div></div>');
 	    	selector = "#" + "Panel" + index;
+
 	    }
 	    $(document).ready(function(){
 		  $(".panel-tools .closed-tool").click(function(event){
@@ -153,6 +156,18 @@
 	    	}
 	    });
 	    svg.call(zoom);
+
+	    $("#Check"+index).click(function() {
+	    	console.log("AMAZING");
+	    	var blesses = [];
+	    	for(var i = 0; i < inners.length; i++) {
+	    		var index = inners[i][1];
+	    		if($("#Check"+index).is(":checked")) {
+	    			blesses.push(index);
+	    		}
+	    	}
+	    	MultigraphRenderer.render(blesses);
+	    });
 	    // Simple function to style the tooltip for the given node.
 	    var styleTooltip = function(name, description) {
 	      return "<p class='name'>" + name + "</p><p class='description'>" + description + "</p>";
