@@ -7,6 +7,15 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 @import url("http://fonts.googleapis.com/css?family=Lato:300,700,700italic&subset=latin,latin-ext");
 @import url("http://fonts.googleapis.com/css?family=Raleway:300,700&subset=latin,latin-ext");
 
+.please-stop {
+  height: 100%;
+}
+
+.stop-scrolling {
+  height: 100% !important;
+  overflow: hidden !important;
+}
+
 
 h4, h5, h6,
 h1, h2, h3 {margin: 0;}
@@ -19,6 +28,9 @@ html, body{
     overflow-x: hidden;
     background: #f4f7f9;
 }
+
+
+
 body a{
 	transition: 0.5s all ease;
 	-webkit-transition: 0.5s all ease;
@@ -53,6 +65,7 @@ body a:hover{
 }
 .main-content {
     position: relative;
+    height: 100%;
 }
 /*-------HEADER SECTION------*/
 /* ----STICKY HEADER----*/

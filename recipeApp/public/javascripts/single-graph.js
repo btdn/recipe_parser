@@ -5,6 +5,10 @@
 
   var mostRecentNode = '';
 
+  var seenBeforeIngrTotal = {};
+
+  var seenBeforeInstrTotal = {};
+
   function isUppercase(word) {
     return (word === word.toUpperCase()); 
   }
@@ -43,8 +47,8 @@
         return a.length;
       }
       if (!memo[a.length.toString() + b.length.toString()]) {
-        t1 = levenshteinDistance(a.slice(1), b, similarities) + 0.25;
-        t2 = levenshteinDistance(a, b.slice(1), similarities) + 0.25;
+        t1 = levenshteinDistance(a.slice(1), b, similarities) + 0.20;
+        t2 = levenshteinDistance(a, b.slice(1), similarities) + 0.20;
         t3 = levenshteinDistance(a.slice(1), b.slice(1), similarities) + (a[0] !== b[0] ? calculateChangeCost(a[0], b[0], similarities) : 0);
         memo[a.length.toString() + b.length.toString()] = Math.min(t1, t2, t3);
       }
@@ -132,8 +136,8 @@
     return mostRecentNode;
   }
 
-  function processStatesAndEdges(ingredients, instructions, seenBeforeIngrTotal, seenBeforeInstrTotal) {
-    nodeList = []
+  function processStatesAndEdges(ingredients, instructions) {
+    nodeList = [];
     var states = {};
     var seenBeforeIngr = {};
     var edges = {};
@@ -146,6 +150,7 @@
     
     for(var i = 0; i < ingredients.length; i++) {
       ingredient = ingredients[i]
+      console.log(ingredient['name']);
       if(seenBeforeIngrTotal[ingredient['name']]) {
         seenBeforeIngrTotal[ingredient['name']] += 1;
       } else {
@@ -245,13 +250,14 @@
         }
       }
     }
+    console.log(seenBeforeIngrTotal);
     return [states, edges, clusters, justText, textIndexes];
   }
 
 
   RenderInstance.render = function(jsonResults) {
-    var seenBeforeIngrTotal = {};
-    var seenBeforeInstrTotal = {};
+    seenBeforeIngrTotal = {};
+    seenBeforeInstrTotal = {};
     $("#searchSize").text(jsonResults['data'].length);
     var finalResults = [];
     $.getJSON("javascripts/moo.json", function(jsonCurr) { //json containing all word2vec similarity
@@ -261,13 +267,14 @@
       var maxState = [];
       var minState = [];
       var minIndex = 0;
+      var maxIndex = 0;
       var finalResults = [];
       var currSearch = [];
       for(var i = 0; i < jsonResults['data'].length; i++) {
         var ingredients1 = jsonResults['data'][i][1];
         var instructions1 = jsonResults['data'][i][0];
         var recipe_name = jsonResults['data'][i][2];
-        var packed1 = processStatesAndEdges(ingredients1, instructions1, seenBeforeIngrTotal, seenBeforeInstrTotal);
+        var packed1 = processStatesAndEdges(ingredients1, instructions1);
         var states1 = packed1[0];
         var edges1 = packed1[1];
         var clusters1 = packed1[2];
@@ -281,13 +288,24 @@
         var vertices1 = topologicalSort(edges1);
         var counter = 0;
         finalResults.push([]);
+        var top6Arr = [];
         for(var j = 0; j < jsonResults['data'].length; j++) {
           var edges2 = currSearch[j][1];
           var vertices2 = topologicalSort(edges2);
           var count = levenshteinDistance(vertices1, vertices2, jsonCurr);
           counter += count;
           finalResults[i].push(count);
+          if(j != i) {
+            top6Arr.push([count, j]);
+          }
         }
+        top6Arr.sort(function(a,b) {return a[0] - b[0];})
+        top6Arr = top6Arr.slice(0,5);
+
+        top6Arr.push([0, i]);
+        top6Arr.sort(function(a,b) {return currSearch[a[1]][0].length - currSearch[b[1]][0].length});
+        console.log(top6Arr);
+        currSearch[i].push(top6Arr);
         if(counter < min) {
           min = counter;
           minState = [states1, edges1, clusters1, justText];
@@ -296,13 +314,22 @@
         if(counter > max) {
           max = counter;
           maxState = [states1, edges1, clusters1, justText];
+          maxIndex = i;
         }
       }
-
       var freqIngr = [];
-      for(key in seenBeforeIngrTotal) freqIngr.push({key: key, freq: seenBeforeIngrTotal[key]});
+
+      for(var keyA in seenBeforeIngrTotal) freqIngr.push({key: keyA, freq: seenBeforeIngrTotal[keyA]});
+      console.log(seenBeforeIngrTotal);
+    //  for(var keyB in seenBeforeIngrTotal) {
+    //    freqIngr.push(keyB);
+    //  }
       $("#totalIngredients").text(Object.keys(seenBeforeIngrTotal).length);
       freqIngr.sort(function(a,b){return b.freq - a.freq})
+      console.log(freqIngr);
+      console.log(seenBeforeIngrTotal);
+      console.log(freqIngr.length);
+    //  console.log(freqIngr);
       var freqInstr = [];
       for(key in seenBeforeInstrTotal) freqInstr.push({key: key, freq: seenBeforeInstrTotal[key]});
       freqInstr.sort(function(a,b){return b.freq - a.freq});
@@ -316,6 +343,9 @@
           y:  finalResults[i][1],
         };
         if (i == minIndex) {
+          finalResults[i].marker = {fillColor: 'green'};
+        }
+        if (i == maxIndex) {
           finalResults[i].marker = {fillColor: 'red'};
         }
       } 
@@ -324,7 +354,7 @@
       window.sessionStorage.setItem('currSearch', JSON.stringify(currSearch) );
       var pairs = [];
       for(var i = 1; i < 5; i++) {
-        for(var j = 1; j < 5; j++) {
+        for(var j = 1; j < 4; j++) {
           pairs.push([i, j]);
         }
       }

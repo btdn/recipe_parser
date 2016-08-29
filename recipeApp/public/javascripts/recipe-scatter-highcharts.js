@@ -74,7 +74,7 @@ $(function () {
             },
             series: [{
                 name: 'recipe',
-                color: 'rgba(223, 83, 83, .5)',
+                color: 'black',
                 data: currData,
                 point: {
                     events: {
