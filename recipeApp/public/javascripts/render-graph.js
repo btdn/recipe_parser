@@ -109,6 +109,7 @@
 		var currGraph = window.sessionStorage.getItem('currSearch');
 		currGraph = JSON.parse(currGraph);
 		var edges = currGraph[index][1];
+		console.log(edges);
 		var states = currGraph[index][0];
 		var clusters = currGraph[index][2];
 		var recipe_name = currGraph[index][3];
@@ -191,7 +192,6 @@
 	    			inner1.attr("transform", "translate(" + d3.event.translate + ")" +
 	                "scale(" + d3.event.scale + ")");
 	    		}
-
 	    	}
 	    	$("body").removeClass("stop-scrolling");
 	    	$("html").removeClass("stop-scrolling");

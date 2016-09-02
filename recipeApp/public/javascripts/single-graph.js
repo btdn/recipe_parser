@@ -38,6 +38,14 @@
     }
   }
 
+  function onlyInstructions(arr) {
+    for(var i = 0; i < arr.length; i++) {
+      if(isUppercase(arr[i])) {
+        return arr.slice(i, arr.length);
+      }
+    }
+  }
+
   var memo = {};
   function levenshteinDistance (a, b, similarities) {
       if (!a.length) {
@@ -192,12 +200,8 @@
         justText.push(instructions[i]['text'].trim());
         textIndex += 1;
       } 
-      console.log(instructions[i]['keyword']);
       textIndexes[instructions[i]['keyword']] = textIndex;
     }
-    console.log(instructions);
-    console.log(justText);
-    console.log(textIndexes);
 
     // Set up the edges
     for(i = 0; i < instructions.length; i++) {
@@ -286,6 +290,9 @@
       for(var i = 0; i < jsonResults['data'].length; i++) {
         var edges1 = currSearch[i][1];
         var vertices1 = topologicalSort(edges1);
+        var onlyInstr = onlyInstructions(vertices1);
+        
+        console.log(vertices1);
         var counter = 0;
         finalResults.push([]);
         var top6Arr = [];
@@ -306,6 +313,7 @@
         top6Arr.sort(function(a,b) {return currSearch[a[1]][0].length - currSearch[b[1]][0].length});
         console.log(top6Arr);
         currSearch[i].push(top6Arr);
+        currSearch[i].push(onlyInstr);
         if(counter < min) {
           min = counter;
           minState = [states1, edges1, clusters1, justText];
@@ -361,6 +369,7 @@
       window.sessionStorage.setItem('pairs', JSON.stringify(pairs));
       window.sessionStorage.setItem('currGraphIndex', 0);
       GraphRenderer.render(minIndex, freqIngr, freqInstr);
+      CircleRenderer.render();
     });
   };
   window.RenderInstance = RenderInstance;
