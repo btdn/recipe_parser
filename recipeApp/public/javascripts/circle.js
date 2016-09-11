@@ -1,19 +1,21 @@
 (function() {
 	CircleRenderer = {};
-	CircleRenderer.render = function () {
+	CircleRenderer.render = function (indexArray) {
 
 		var currGraph = window.sessionStorage.getItem('currSearch');
 		currGraph = JSON.parse(currGraph);
 		var example = [];
 		var ingredientCircles = [];
-		for(var i = 0; i < currGraph.length; i++) {
-			example.push([currGraph[i][7], currGraph[i][3], currGraph[i][4], currGraph[i][5], currGraph[i][2]]);
+		if(indexArray) {
+			for(var i = 0; i < indexArray.length; i++) {
+				example.push([currGraph[indexArray[i]][7], currGraph[indexArray[i]][3], currGraph[indexArray[i]][4], currGraph[indexArray[i]][5], currGraph[indexArray[i]][2]]);
+			}
+		} else {
+			for(var i = 0; i < currGraph.length; i++) {
+				example.push([currGraph[i][7], currGraph[i][3], currGraph[i][4], currGraph[i][5], currGraph[i][2]]);
+			}
 		}
 
-	//	console.log(justInstr);
-
-	
-//	 var example = [["ADD", "BAKE", "HEAT", "COOL"], ["ADD","BAKE", "HEAT"], ["PREHEAT","BAKE", "ADD", "HEAT"]];
 
 	 var nodeDict = {};
 
@@ -38,13 +40,13 @@
 		for(var j = 0; j < instance.length; j++) {
 			var circle = {ingredient: false, description: justText[textIndexes[instance[j]]], name: "node"+i, "group": counter, x: xCounter, y: yCounter, r: 15, label: instance[j]};
 			
-			var subXCounter = 15;
+			var subXCounter = 5;
 			if (example[i][4][instance[j]]) {
 				for(var k = 0; k < example[i][4][instance[j]].length; k++) {
 					console.log(instance[j]);
 					var ingrCircle = {ingredient: true, name: "ingrNode"+i, "group": counter, x: xCounter + subXCounter, y: yCounter, r: 15, label: example[i][4][instance[j]][k]};
 					jsonCircles.push(ingrCircle)
-					subXCounter -= 5
+				//	subXCounter -= 5
 					console.log(example[i][4][instance[j]][k]);
 				}
 			}
@@ -58,9 +60,6 @@
 		xCounter += 40;
 	}
 	jsonCircles = jsonCircles.slice(0, 300);
-//	jsonCircles = jsonCircles.sort(function(a,b) { a.length - b.length});
-	console.log(jsonCircles)
-	//return;
 
 	  var width = 960,
 	  height = 500;
@@ -69,7 +68,7 @@
 
 
 
-
+$("#canvas").html("")
 var svg = d3.select("#canvas")
 var container  = svg.append("g")
  
@@ -104,7 +103,6 @@ var container  = svg.append("g")
 	            	.attr("class", function(d) {
 
 	            		if(d.label === y.label) {
-	            			console.log("BOOB")
 	            			nodeDict[y.label] = "." + d.label + y.label
 	            			usedBefore[d.group] = ""
 	            			return d.label + y.label;
@@ -142,7 +140,7 @@ var container  = svg.append("g")
 	        .attr("dy", function(d){return 4})
 	        .style("font-size","6pt")
 	        .style("font-family","Avenir")
-	        .text(function(d){if(!d.ingredient) { return d.label } })
+	        .text(function(d){ return d.label })
 	        
 
 	    circle

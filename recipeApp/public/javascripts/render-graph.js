@@ -218,7 +218,7 @@
 	    render(inner, g);
 	    inner.selectAll("g.node")
 	      .attr("title", function(v) { return styleTooltip(v, g.node(v).description) })
-	  //    .attr("id", function(d, i){ console.log(index); var result = 'index'+index+'-'+textIndexes[i]; return result; })
+	      .attr("class", 'node selection' )
 	  	  .each(function(v) { $(this).attr('id',  'index'+index+'-'+textIndexes[v]); })
 	      .each(function(v) { $(this).tipsy({ gravity: "w", opacity: 1, html: true }); $(this).hover(function(){ var numberPattern = /\d+/g; var nums = this.id.match(numberPattern); $("#text"+nums[0]+"-"+nums[1]).toggleClass("backHover");}); });
 	    // Center the graph
@@ -228,6 +228,8 @@
 	      .scale(initialScale)
 	      .event(svg);
 	    svg.attr('height', g.graph().height * initialScale + 40);
+
+	    NodeSelection.select();
 	    // Set up zoom support
 	};
 	window.GraphRenderer = GraphRenderer;

@@ -357,6 +357,7 @@
           finalResults[i].marker = {fillColor: 'red'};
         }
       } 
+      window.sessionStorage.setItem("finalResults", JSON.stringify(finalResults) );
       recipeChartView.render(finalResults);
 
       window.sessionStorage.setItem('currSearch', JSON.stringify(currSearch) );
