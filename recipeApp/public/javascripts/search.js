@@ -1,49 +1,24 @@
-var dummyData = [
-	{ name: 'apple',
-	type: 'ingredient',
-	id: 0,
-	},
-	{ name: 'milk',
-	type: 'ingredient',
-	id: 1,
-	},
-	{ name: 'flour',
-	type: 'ingredient',
-	id: 2,
-	},
-	{ name: 'eggs',
-	type: 'ingredient',
-	id: 3,
-	},
-	{ name: 'salt',
-	type: 'ingredient',
-	id: 4,
-	},
-	{ name: 'pepper',
-	type: 'ingredient',
-	id: 5,
-	},
-	{ name: 'stir',
-	type: 'action',
-	id: 6,
-	},
-	{ name: 'bake',
-	type: 'action',
-	id: 7,
-	},
-	{ name: 'boil',
-	type: 'action',
-	id: 8,
-	},
-	{ name: 'fry',
-	type: 'action',
-	id: 9,
-	},
-	{ name: 'broil',
-	type: 'action',
-	id: 10,
-	},
-];
+ function isUppercase(word) {
+    return (word === word.toUpperCase()); 
+ }
+
+var currGraph = JSON.parse(window.sessionStorage.getItem('currSearch'));
+var states = currGraph[0][0];
+
+var dummyData = [];
+var includeArr = [];
+var excludeArr = [];
+var counter = 0;
+
+for(var state in states) {
+	console.log(state);
+	if(isUppercase(state)) {
+		dummyData.push({name: state, type: 'action', id: counter})
+	} else {
+		dummyData.push({name: state, type: 'ingredient', id: counter})
+	}
+	counter += 1;
+}
 
 var dummyRecipes = ['blueberry muffins', 'chocolate chip cookies', 'peanut butter cookies', 'sugar cookies', 'BLT sandwich', 'blueberry pancakes', 'falafel wrap', 'Sunday Pot Roast', 'potato latkes']
 
@@ -83,7 +58,6 @@ $recipeSearchBar.keyup(function(event) {
 
 var $searchBar =  $(".searchBar");
 $searchBar.keyup(function(event) {
-	console.log("AWESOME");
 	var value = $searchBar.val();
 	$("#searchContents").empty();
 	console.log(value);
@@ -103,6 +77,12 @@ $searchBar.keyup(function(event) {
 					var classes = $(this).attr("class").split(' ');
 					var contentStyling = classes[1];
 					var borderStyling = classes[0];
+					console.log($(this).text());
+					if(contentStyling.indexOf('YES') != -1) {
+						includeArr.push($(this).text());
+					} else {
+						excludeArr.push($(this).text());
+					} 
 					$('#col'+ borderStyling).append("<li class='"+ contentStyling + " " + borderStyling + "' id='input"+ $(this).attr('id')+"'>"+$(this).text()+"</li>");
 					$(this).remove();
 				});
@@ -116,6 +96,70 @@ $searchBar.keyup(function(event) {
 		}
 
 	}
+
+});
+
+function findRecipe(keyword, currGraph) {
+	var indexes = [];
+	for(var i = 0; i < currGraph.length; i++) {
+		var recipe = currGraph[i];
+		var states = recipe[0];
+		if(states[keyword]) {
+			indexes.push(i);
+		}
+	}
+	return indexes
+}
+
+function findCommonRecipes(incudeArr, excludeArr, currGraph) {
+	var indexesEx = {};
+	var indexes = [];
+	for(var i = 0; i < excludeArr.length; i++) {
+		var newIndex = findRecipe(excludeArr[i], currGraph);
+		for(var j = 0; j < newIndex.length; j++) {
+			indexesEx[newIndex[j]] = 1;
+		}
+	//	indexesEx[findRecipe(excludeArr[i], currGraph)] = 1;
+	}
+	console.log(indexesEx);
+	for(var i = 0; i < includeArr.length; i++) {
+		var newIndex = findRecipe(includeArr[i], currGraph);
+		for(var j = 0; j < newIndex.length; j++) {
+			console.log(newIndex[j]);
+			console.log(indexesEx[newIndex[j]]);
+			if (!indexesEx[newIndex[j]]) {
+				indexes.push(newIndex[j]);
+			}
+		}
+	//	if (!indexesEx[newIndex]) {
+	//		indexes = indexes.concat(findRecipe(includeArr[i], currGraph));
+	//	}	
+	}
+	console.log(indexes);
+	return indexes;
+}
+
+$("#searchBtn").click(function(event) {
+	var finalResults = JSON.parse(window.sessionStorage.getItem('finalResults'));
+	var commonIndexes = findCommonRecipes(includeArr, excludeArr, currGraph);
+	console.log(commonIndexes);
+	if(commonIndexes.length > 0) {
+		window.sessionStorage.setItem('commonIndexes', JSON.stringify(commonIndexes) );
+		window.sessionStorage.setItem('include', JSON.stringify(includeArr) );
+		window.sessionStorage.setItem('exclude', JSON.stringify(excludeArr) );
+	}
+//	window.location.href = "/";
+	//CircleRenderer.render(commonIndexes)
+	//				recipeChartView.render(finalResults);
+	/*				for(var i = 0; i < commonIndexes.length; i++) {
+						if(finalResults[i].marker)
+						GraphRenderer.render(commonIndexes[i]);
+						if(!finalResults[commonIndexes[i]].marker) {
+							finalResults[commonIndexes[i]].marker = {fillColor: 'purple'};	
+						}
+					}*/
+	
+	//				recipeChartView.render(finalResults); 
 
 });
 

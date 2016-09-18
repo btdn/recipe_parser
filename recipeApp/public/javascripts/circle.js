@@ -1,13 +1,15 @@
 (function() {
 	CircleRenderer = {};
 	CircleRenderer.render = function (indexArray) {
-
+		console.log(indexArray);
 		var currGraph = window.sessionStorage.getItem('currSearch');
 		currGraph = JSON.parse(currGraph);
+		currGraph = currGraph.slice(0, 20);
 		var example = [];
 		var ingredientCircles = [];
 		if(indexArray) {
 			for(var i = 0; i < indexArray.length; i++) {
+				if(indexArray[i] >= currGraph.length) break;
 				example.push([currGraph[indexArray[i]][7], currGraph[indexArray[i]][3], currGraph[indexArray[i]][4], currGraph[indexArray[i]][5], currGraph[indexArray[i]][2]]);
 			}
 		} else {
@@ -15,7 +17,6 @@
 				example.push([currGraph[i][7], currGraph[i][3], currGraph[i][4], currGraph[i][5], currGraph[i][2]]);
 			}
 		}
-
 
 	 var nodeDict = {};
 
@@ -59,7 +60,7 @@
 		yCounter = 15;
 		xCounter += 40;
 	}
-	jsonCircles = jsonCircles.slice(0, 300);
+//	jsonCircles = jsonCircles.slice(0, 300);
 
 	  var width = 960,
 	  height = 500;

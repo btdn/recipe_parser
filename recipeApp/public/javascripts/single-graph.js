@@ -357,7 +357,24 @@
           finalResults[i].marker = {fillColor: 'red'};
         }
       } 
-      window.sessionStorage.setItem("finalResults", JSON.stringify(finalResults) );
+      var commonIndexes = null;
+      console.log(window.sessionStorage.getItem("finalResults"));
+      console.log(window.sessionStorage.getItem("commonIndexes"));
+      if(window.sessionStorage.getItem("commonIndexes") && typeof window.sessionStorage.getItem('commonIndexes') !== "undefined") {
+        finalResults = JSON.parse(window.sessionStorage.getItem("finalResults") );
+        commonIndexes = JSON.parse(window.sessionStorage.getItem("commonIndexes") );
+        console.log(commonIndexes);
+        recipeChartView.render(finalResults);
+          for(var i = 0; i < commonIndexes.length; i++) {
+        //    if(finalResults[i].marker)
+       //     GraphRenderer.render(commonIndexes[i]);
+            if(!finalResults[commonIndexes[i]].marker) {
+              finalResults[commonIndexes[i]].marker = {fillColor: 'purple'};  
+            }
+          }
+      } else {
+        window.sessionStorage.setItem("finalResults", JSON.stringify(finalResults) );
+      }
       recipeChartView.render(finalResults);
 
       window.sessionStorage.setItem('currSearch', JSON.stringify(currSearch) );
@@ -370,7 +387,7 @@
       window.sessionStorage.setItem('pairs', JSON.stringify(pairs));
       window.sessionStorage.setItem('currGraphIndex', 0);
       GraphRenderer.render(minIndex, freqIngr, freqInstr);
-      CircleRenderer.render();
+      CircleRenderer.render(commonIndexes);
     });
   };
   window.RenderInstance = RenderInstance;

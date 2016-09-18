@@ -28,6 +28,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
 
 app.get('/', controllers.index)
+app.get('/search', controllers.search)
 app.get('/demo', controllers.demo)
 app.get('/recipes', recipe.recipes)
 app.get('/get_recipes', recipe.get_recipes)
