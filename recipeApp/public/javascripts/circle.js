@@ -160,7 +160,7 @@ var container  = svg.append("g")
 	    		$("."+d.name).css("fill", "gray");
 	    		$("."+d.label).css("fill", "#ADD8E6");
 		    	for(var i = 0; i < clickCount.length; i++) {
-	    			var name = clickCount[i];
+	    			var name = clickCount[i][1];
 	    			$("."+name).css("fill", "#ADD8E6");
 	    		}	    			
 
@@ -176,23 +176,25 @@ var container  = svg.append("g")
     			$("."+d.name).css("fill", "white");
 	    		
 	    		for(var i = 0; i < clickCount.length; i++) {
-	    			var name = clickCount[i];
+	    			var name = clickCount[i][1];
 	    			$("."+name).css("fill", "#ADD8E6");
 	    		}	    
 
 	    	})
 	    	.on("click", function(d) {
-	    		clickCount.push(d.index);
+	    		clickCount.push([d.index, d.name]);
 	    		if(clickCount.length < 2) {
 	    			$("."+d.name).css("fill", "#ADD8E6");	
 	    		} else {
 	    			console.log(clickCount);
-	    			AddListeners.recieve(clickCount[0], clickCount[1]);	
+	    				
 	    			for(var i = 0; i < clickCount.length; i++) {
-		    			var name = clickCount[i];
+		    			var name = clickCount[i][1];
 		    			$("."+name).css("fill", "white");
 	    			}
-	    			$("."+d.name).css("fill", "#ADD8E6");
+
+	    	//		$("."+d.name).css("fill", "#ADD8E6");
+	    			AddListeners.recieve(clickCount[0][0], clickCount[1][0]);
 	    				 
 	    			clickCount = [];
 	    		}
@@ -210,7 +212,7 @@ var container  = svg.append("g")
 	    		$("."+d.name).css("fill", "gray");
 	    		$("."+d.label).css("fill", "#ADD8E6");
 		    	for(var i = 0; i < clickCount.length; i++) {
-	    			var name = clickCount[i];
+	    			var name = clickCount[i][1];
 	    			$("."+name).css("fill", "#ADD8E6");
 	    		}	    			
 
@@ -226,24 +228,24 @@ var container  = svg.append("g")
     			$("."+d.name).css("fill", "white");
 	    		
 	    		for(var i = 0; i < clickCount.length; i++) {
-	    			var name = clickCount[i];
+	    			var name = clickCount[i][1];
 	    			$("."+name).css("fill", "#ADD8E6");
 	    		}	    
 
 	    	})
 	    	.on("click", function(d) {
-	    		clickCount.push(d.index);
+	    		clickCount.push([d.index, d.name]);
 	    		if(clickCount.length < 2) {
 	    			$("."+d.name).css("fill", "#ADD8E6");
 
 	    		} else {
 	    			console.log(clickCount);
 	    			for(var i = 0; i < clickCount.length; i++) {
-		    			var name = clickCount[i];
+		    			var name = clickCount[i][1];
 		    			$("."+name).css("fill", "white");
 	    			}
-	    			$("."+d.name).css("fill", "#ADD8E6");
-	    			AddListeners.recieve(clickCount[0], clickCount[1]);		 
+	    		//	$("."+d.name).css("fill", "#ADD8E6");
+	    			AddListeners.recieve(clickCount[0][0], clickCount[1][0]);		 
 	    			clickCount = [];
 	    		}
 	    		
