@@ -14,9 +14,9 @@
 	//	UpgradeListener.listen(index1);	
 	}
 
-	function createTextBlocks(indexes, currGraph) {
-		var index1 = indexes[0];
-		var index2 = indexes[1];
+	function createTextBlocks(indeces, currGraph) {
+		var index1 = indeces[0];
+		var index2 = indeces[1];
 		var instructionsA = currGraph[index1][7];
 		var instructionsB = currGraph[index2][7];
 		// var longer;
@@ -61,6 +61,8 @@
 	}
 
 	AddListeners.recieve = function(index1, index2) {
+		console.log(index1);
+		console.log(index2);
 		modal(index1, index2);
 		var currGraph = window.sessionStorage.getItem('currSearch');
 	    currGraph = JSON.parse(currGraph);

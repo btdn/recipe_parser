@@ -9,7 +9,7 @@ var con = mysql.createConnection({
 });
 
 //edit this...can be up to 300 chocolate chip cookies
-var dataSize = '50';
+var dataSize = '100';
 
 //Establishing mysql connection
 con.connect(function(err){

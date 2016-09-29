@@ -162,8 +162,9 @@
 	    
 	    if (graphIndex) {
 	    	graphIndex = false;
+	    	$("#mainPanelTitle").html('<ul class="panel-tools"><li><a id="closed'+index+'" class="glyphicon refresh-tool glyphicon-refresh"></a></li></ul>')
 	    } else {
-	    	$("#row"+rowIndex).append('<div class="col-md-4 parent-closed" style="padding:0px; margin-bottom:0px"><div class="panel panel-widget" style="margin-bottom:0px;"><div class="panel-title truncate clickPanel" id="panel'+index+'" style="font-size:7pt">'+recipe_name+'<ul class="panel-tools"><li><a id="graph'+index+'" href="#union-graph"><input id="'+'Check'+index+'" type="checkbox"></a></li><li><a id="closed'+index+'" class="icon closed-tool"><i class="fa fa-times"></i></a></li></ul></div><div class="row"><div class="col-md-4" style="padding: 0px; overflow: scroll; height: 350px; word-wrap: break-word; font-size: 6pt">'+formatString+'</div><div class="col-md-8"><svg id="'+'Panel'+index+'" style="width: 100%; height: 350px"></svg></div></div></div></div>');
+	    	$("#row"+rowIndex).append('<div class="col-md-4 parent-closed" style="padding:0px; margin-bottom:0px"><div class="panel panel-widget" style="margin-bottom:0px;"><div class="panel-title truncate clickPanel" id="panel'+index+'" style="font-size:7pt">'+recipe_name+'<ul class="panel-tools"><li><a id="graph'+index+'" href="#union-graph"><input id="'+'Check'+index+'" type="checkbox"></a></li><li><a id="closed'+index+'" class="glyphicon refresh-tool glyphicon-refresh"></a></li></ul></div><div class="row"><div class="col-md-4" style="padding: 0px; overflow: scroll; height: 350px; word-wrap: break-word; font-size: 6pt">'+formatString+'</div><div class="col-md-8"><svg id="'+'Panel'+index+'" style="width: 100%; height: 350px"></svg></div></div></div></div>');
 	    	selector = "#" + "Panel" + index;
 
 	    }
@@ -172,10 +173,12 @@
 		  	$(this).parents(".parent-closed").html('');
 		  	RenderClosed.render();
 		  });
+
 		}); 
 		AddListeners.listenNow();
 	    $(selector).html('');
 	    var svg = d3.select(selector);
+
 	    var inner = svg.append("g");
 	    inners.push([inner, index]);
 	    // Set up zoom support
@@ -200,7 +203,13 @@
 	    svg.on("wheel.zoom", null);
         svg.on("mousewheel.zoom", null);
 
-
+        $(".panel-tools .refresh-tool").click(function(event){
+		  	zoom
+	      		.translate([(svg.attr("width") - g.graph().width * 0.25) / 2, 10])
+	      		.scale(initialScale)
+	      		.event(svg);
+	    	svg.attr('height', g.graph().height * initialScale + 40);
+		 });
 	    $("#Check"+index).click(function() {
 	    	$('#graph'+index).click();
 	    	var blesses = [];
@@ -211,6 +220,12 @@
 	    			blesses.push(index);
 	    		}
 	    	}
+	    	zoom
+	      .translate([(svg.attr("width") - g.graph().width * 0.25) / 2, 10])
+	      .scale(initialScale)
+	      .event(svg);
+	    svg.attr('height', g.graph().height * initialScale + 40);
+
 	    	MultigraphRenderer.render(blesses);
 	    });
 	    // Simple function to style the tooltip for the given node.

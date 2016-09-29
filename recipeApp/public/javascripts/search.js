@@ -3,6 +3,7 @@
  }
 
 var currGraph = JSON.parse(window.sessionStorage.getItem('currSearch'));
+console.log(currGraph)
 var states = currGraph[0][0];
 
 var dummyData = [];
@@ -91,7 +92,8 @@ $searchBar.keyup(function(event) {
 					var borderStyling = classes[0];
 					console.log('onclick'+ borderStyling);
 					$(this).toggleClass('onclick'+ borderStyling);
-				});		
+				});	
+
 			}
 		}
 
@@ -114,6 +116,7 @@ function findRecipe(keyword, currGraph) {
 function findCommonRecipes(incudeArr, excludeArr, currGraph) {
 	var indexesEx = {};
 	var indexes = [];
+	console.log(excludeArr);	
 	for(var i = 0; i < excludeArr.length; i++) {
 		var newIndex = findRecipe(excludeArr[i], currGraph);
 		for(var j = 0; j < newIndex.length; j++) {
@@ -148,7 +151,7 @@ $("#searchBtn").click(function(event) {
 		window.sessionStorage.setItem('include', JSON.stringify(includeArr) );
 		window.sessionStorage.setItem('exclude', JSON.stringify(excludeArr) );
 	}
-	window.location.href = "/";
+//	window.location.href = "/";
 	//CircleRenderer.render(commonIndexes)
 	//				recipeChartView.render(finalResults);
 	/*				for(var i = 0; i < commonIndexes.length; i++) {

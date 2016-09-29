@@ -11,11 +11,11 @@
 		if(indexArray) {
 			for(var i = 0; i < indexArray.length; i++) {
 				if(indexArray[i] >= currGraph.length) break;
-				example.push([currGraph[indexArray[i]][7], currGraph[indexArray[i]][3], currGraph[indexArray[i]][4], currGraph[indexArray[i]][5], currGraph[indexArray[i]][2]]);
+				example.push([currGraph[indexArray[i]][7], currGraph[indexArray[i]][3], currGraph[indexArray[i]][4], currGraph[indexArray[i]][5], currGraph[indexArray[i]][2], indexArray[i]]);
 			}
 		} else {
 			for(var i = 0; i < currGraph.length; i++) {
-				example.push([currGraph[i][7], currGraph[i][3], currGraph[i][4], currGraph[i][5], currGraph[i][2]]);
+				example.push([currGraph[i][7], currGraph[i][3], currGraph[i][4], currGraph[i][5], currGraph[i][2], i]);
 			}
 		}
 
@@ -39,8 +39,9 @@
 		var instance = example[i][0];
 		var justText = example[i][2];
 		var textIndexes = example[i][3];
+		var currIndex = example[i][5];
 		for(var j = 0; j < instance.length; j++) {
-			var circle = {ingredient: false, description: justText[textIndexes[instance[j]]], name: "node"+i, "group": counter, x: xCounter, y: yCounter, r: 15, label: instance[j]};
+			var circle = {ingredient: false, description: justText[textIndexes[instance[j]]], index: currIndex, name: "node"+i, "group": counter, x: xCounter, y: yCounter, r: 15, label: instance[j]};
 			
 			var subXCounter = 5;
 			if (example[i][4][instance[j]]) {
@@ -181,17 +182,18 @@ var container  = svg.append("g")
 
 	    	})
 	    	.on("click", function(d) {
-	    		clickCount.push(d.name);
+	    		clickCount.push(d.index);
 	    		if(clickCount.length < 2) {
 	    			$("."+d.name).css("fill", "#ADD8E6");	
 	    		} else {
+	    			console.log(clickCount);
+	    			AddListeners.recieve(clickCount[0], clickCount[1]);	
 	    			for(var i = 0; i < clickCount.length; i++) {
 		    			var name = clickCount[i];
 		    			$("."+name).css("fill", "white");
 	    			}
 	    			$("."+d.name).css("fill", "#ADD8E6");
-	    			console.log(clickCount[0].match(/\d+/)[0]);
-	    			AddListeners.recieve(clickCount[0].match(/\d+/)[0], clickCount[1].match(/\d+/)[0]);		 
+	    				 
 	    			clickCount = [];
 	    		}
 	    		
@@ -230,36 +232,47 @@ var container  = svg.append("g")
 
 	    	})
 	    	.on("click", function(d) {
-	    		clickCount.push(d.name);
+	    		clickCount.push(d.index);
 	    		if(clickCount.length < 2) {
-	    			$("."+d.name).css("fill", "#ADD8E6");	
+	    			$("."+d.name).css("fill", "#ADD8E6");
+
 	    		} else {
-	    			
+	    			console.log(clickCount);
 	    			for(var i = 0; i < clickCount.length; i++) {
 		    			var name = clickCount[i];
 		    			$("."+name).css("fill", "white");
 	    			}
 	    			$("."+d.name).css("fill", "#ADD8E6");
-	    			console.log(clickCount[0].match(/\d+/)[0]);
-	    			AddListeners.recieve(clickCount[0].match(/\d+/)[0], clickCount[1].match(/\d+/)[0]);		 
+	    			AddListeners.recieve(clickCount[0], clickCount[1]);		 
 	    			clickCount = [];
 	    		}
 	    		
 	    	});
-
-
-	    		     svg.call(d3.behavior.zoom()
+	    	var zoom = d3.behavior.zoom()
    //     .x(x)
    //     .y(y)
         .scaleExtent([1,3])
-        .on("zoom", zoom))
+        .on("zoom", zoomIn)
 
-	//   container.append(elemEnter)
-  function zoom() {
+	    		     svg.call(zoom)
+	  svg.on("wheel.zoom", null)
+	  svg.on("mousewhel.zoom", null)
+	    function zoomIn() {
   	container.attr("transform", "translate(" + d3.event.translate + ")" +
 	            "scale(" + d3.event.scale + ")")
 //  	.attr("transform", function(d){return "translate("+d.x+","+d.y+")"})
   }
+
+	$("#sequenceRefresh").click(function(event) {
+	    console.log(zoom);
+		zoom
+		  .translate([0, 0])
+	      .scale(0.25)
+	      .event(svg);
+	});
+
+	//   container.append(elemEnter)
+
  
 
 
