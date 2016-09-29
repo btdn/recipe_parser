@@ -1,10 +1,11 @@
 (function() {
 	CircleRenderer = {};
+	var clickCount = [];
 	CircleRenderer.render = function (indexArray) {
 		console.log(indexArray);
 		var currGraph = window.sessionStorage.getItem('currSearch');
 		currGraph = JSON.parse(currGraph);
-		currGraph = currGraph.slice(0, 20);
+	//	currGraph = currGraph.slice(0, 20);
 		var example = [];
 		var ingredientCircles = [];
 		if(indexArray) {
@@ -79,42 +80,42 @@ var container  = svg.append("g")
 	        .data(json.nodes)
 
 
-	            var lines = container.attr("class", "line")
-	                .selectAll("line").data(json.nodes)
-	              //  .selectAll("line").data(json.nodes)
-	                .enter()
+	            // var lines = container.attr("class", "line")
+	            //     .selectAll("line").data(json.nodes)
+	            //   //  .selectAll("line").data(json.nodes)
+	            //     .enter()
 
-	            for(var i = 0; i < json.nodes.length; i++) {
-	            	var y = json.nodes[i];
-	            	var dLabel = null
-	            	var line = lines.append("line")
-	            	.attr("x1", function (d, i) {
-	                	return d.x
-	            	})
-	            	.attr("y1", function (d) {
-	                	return d.y
-	            	})
-	            	.attr("x2", function (d) {
-	                	return y.x
-	            	})
-	            	.attr("y2", function (d) {
+	            // for(var i = 0; i < json.nodes.length; i++) {
+	            // 	var y = json.nodes[i];
+	            // 	var dLabel = null
+	            // 	var line = lines.append("line")
+	            // 	.attr("x1", function (d, i) {
+	            //     	return d.x
+	            // 	})
+	            // 	.attr("y1", function (d) {
+	            //     	return d.y
+	            // 	})
+	            // 	.attr("x2", function (d) {
+	            //     	return y.x
+	            // 	})
+	            // 	.attr("y2", function (d) {
 	            		
-	                	return y.y
-	            	})
-	            	.attr("class", function(d) {
+	            //     	return y.y
+	            // 	})
+	            // 	.attr("class", function(d) {
 
-	            		if(d.label === y.label) {
-	            			nodeDict[y.label] = "." + d.label + y.label
-	            			usedBefore[d.group] = ""
-	            			return d.label + y.label;
-	            		} else {
+	            // 		if(d.label === y.label) {
+	            // 			nodeDict[y.label] = "." + d.label + y.label
+	            // 			usedBefore[d.group] = ""
+	            // 			return d.label + y.label;
+	            // 		} else {
 
-	            			return ""
-	            		}
+	            // 			return ""
+	            // 		}
 	            		
-	            	})
+	            // 	})
 
-	            }
+	            // }
 
 	    /*Create and place the "blocks" containing the circle and the text */
 	 //   var container = svg.append("g")  
@@ -136,12 +137,15 @@ var container  = svg.append("g")
 	        .each(function(v) { if(!v.ingredient) {$(this).tipsy({ gravity: "w", opacity: 1, html: true }); } })
 
 	    /* Create the text for each block */
-	    elemEnter.append("text")
+	    var text = elemEnter.append("text")
 	        .attr("dx", function(d){return -13})
 	        .attr("dy", function(d){return 4})
 	        .style("font-size","6pt")
 	        .style("font-family","Avenir")
 	        .text(function(d){ return d.label })
+	        .attr("title", function(v) { if(!v.ingredient) {return styleTooltip(v.label, v.description)} })
+	//       .attr("class", function(d) { if(!d.ingredient) {return d.label + " " + d.name } })
+	        .each(function(v) { if(!v.ingredient) {$(this).tipsy({ gravity: "w", opacity: 1, html: true }); } })
 	        
 
 	    circle
@@ -149,20 +153,100 @@ var container  = svg.append("g")
 	    		$("#sequenceVis").text(recipeNames[d.group]);
 	    		var nodeClass = nodeDict[d.label];
 	    		var selection = $(nodeClass);
+
+
 	    		selection.css("stroke", "gray");
 	    		$("."+d.name).css("fill", "gray");
 	    		$("."+d.label).css("fill", "#ADD8E6");
+		    	for(var i = 0; i < clickCount.length; i++) {
+	    			var name = clickCount[i];
+	    			$("."+name).css("fill", "#ADD8E6");
+	    		}	    			
+
 
 	    		
 	    	})
 	    	.on("mouseout", function(d) {
 	    		var nodeClass = nodeDict[d.label];
 	    		var selection = $(nodeClass);
-	    		selection.css("stroke", "");
-	    		$("."+d.label).css("fill", "white");
-	    		$("."+d.name).css("fill", "white");
 
+    			selection.css("stroke", "");
+    			$("."+d.label).css("fill", "white");
+    			$("."+d.name).css("fill", "white");
+	    		
+	    		for(var i = 0; i < clickCount.length; i++) {
+	    			var name = clickCount[i];
+	    			$("."+name).css("fill", "#ADD8E6");
+	    		}	    
+
+	    	})
+	    	.on("click", function(d) {
+	    		clickCount.push(d.name);
+	    		if(clickCount.length < 2) {
+	    			$("."+d.name).css("fill", "#ADD8E6");	
+	    		} else {
+	    			for(var i = 0; i < clickCount.length; i++) {
+		    			var name = clickCount[i];
+		    			$("."+name).css("fill", "white");
+	    			}
+	    			$("."+d.name).css("fill", "#ADD8E6");
+	    			console.log(clickCount[0].match(/\d+/)[0]);
+	    			AddListeners.recieve(clickCount[0].match(/\d+/)[0], clickCount[1].match(/\d+/)[0]);		 
+	    			clickCount = [];
+	    		}
+	    		
 	    	});
+
+	    text
+	    	.on("mouseover", function(d) { 
+	    		$("#sequenceVis").text(recipeNames[d.group]);
+	    		var nodeClass = nodeDict[d.label];
+	    		var selection = $(nodeClass);
+
+
+	    		selection.css("stroke", "gray");
+	    		$("."+d.name).css("fill", "gray");
+	    		$("."+d.label).css("fill", "#ADD8E6");
+		    	for(var i = 0; i < clickCount.length; i++) {
+	    			var name = clickCount[i];
+	    			$("."+name).css("fill", "#ADD8E6");
+	    		}	    			
+
+
+	    		
+	    	})
+	    	.on("mouseout", function(d) {
+	    		var nodeClass = nodeDict[d.label];
+	    		var selection = $(nodeClass);
+
+    			selection.css("stroke", "");
+    			$("."+d.label).css("fill", "white");
+    			$("."+d.name).css("fill", "white");
+	    		
+	    		for(var i = 0; i < clickCount.length; i++) {
+	    			var name = clickCount[i];
+	    			$("."+name).css("fill", "#ADD8E6");
+	    		}	    
+
+	    	})
+	    	.on("click", function(d) {
+	    		clickCount.push(d.name);
+	    		if(clickCount.length < 2) {
+	    			$("."+d.name).css("fill", "#ADD8E6");	
+	    		} else {
+	    			
+	    			for(var i = 0; i < clickCount.length; i++) {
+		    			var name = clickCount[i];
+		    			$("."+name).css("fill", "white");
+	    			}
+	    			$("."+d.name).css("fill", "#ADD8E6");
+	    			console.log(clickCount[0].match(/\d+/)[0]);
+	    			AddListeners.recieve(clickCount[0].match(/\d+/)[0], clickCount[1].match(/\d+/)[0]);		 
+	    			clickCount = [];
+	    		}
+	    		
+	    	});
+
 
 	    		     svg.call(d3.behavior.zoom()
    //     .x(x)

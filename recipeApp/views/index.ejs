@@ -42,6 +42,7 @@ SmartPhone Compatible web template, free WebDesigns for Nokia, Samsung, LG, Sony
 <!-- Pull in JQuery dependencies -->
 <link rel="stylesheet" href="/stylesheets/tipsy.css">
 <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+
 <script src="/javascripts/tipsy.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.js"></script>
 
@@ -86,12 +87,12 @@ text {
 <link href="stylesheets/freelancer.css" rel="stylesheet">
 <!--//Metis Menu -->
 </head> 
-<body class="cbp-spmenu-push">
+<body class="cbp-spmenu-push cbp-spmenu-push-toright">
 	<div class="main-content">
 		<!--left-fixed -navigation-->
 		<div class="sidebar" role="navigation">
             <div class="navbar-collapse">
-				<nav class="cbp-spmenu cbp-spmenu-vertical cbp-spmenu-right dev-page-sidebar mCustomScrollbar _mCS_1 mCS-autoHide mCS_no_scrollbar" id="cbp-spmenu-s1">
+				<nav class="cbp-spmenu cbp-spmenu-vertical cbp-spmenu-right dev-page-sidebar mCustomScrollbar _mCS_1 mCS-autoHide mCS_no_scrollbar cbp-spmenu-open" id="cbp-spmenu-s1">
 					<div class="scrollbar scrollbar1">
 						<ul class="nav" id="side-menu">
 							<li>
@@ -133,11 +134,11 @@ text {
 				<div class="clearfix"> </div>
 			</div>
 			<!--search-box-->
-				<div class="search-box">
+<!-- 				<div class="search-box">
 					<form class="input">
 						<input class="sb-search-input input__field--madoka" placeholder="Search..." type="search" id="input-31" />
 					</form>
-				</div>
+				</div> -->
 				<!--//end-search-box-->
 			<div class="header-right">
 				
@@ -300,12 +301,16 @@ text {
         </a>
     </div>
 
+    <script src="http://d3plus.org/js/d3.js"></script>
+<script src="http://d3plus.org/js/d3plus.js"></script>
+
     <div id="portfolioModal1">
     </div>
 		 <!-- Portfolio Modals -->
+
 	<script id="modal_template" type="text/x-handlebars-template">
 
-	    <div class="portfolio-modal modal fade" id="portfolioModal" tabindex="-1" role="dialog" aria-hidden="true">
+	    <div class="portfolio-modal modal" id="portfolioModal" tabindex="-1" role="dialog" aria-hidden="true">
 	        <div class="modal-content">
 	            <div class="close-modal" data-dismiss="modal">
 	                <div class="lr">
@@ -315,12 +320,28 @@ text {
 	            </div> 
 	            <div class="container">
 	                <div class="row">
-	                    <div class="col-lg-8 col-lg-offset-2">
+	        
 	                        <div class="modal-body">
-	                            <h2>{{title}}</h2>
+	                        	<div class="row">
+	                        		<div class="col-sm-1"></div>
+	                        		<div class="col-sm-4">
+	                        		<h2>{{title1}}</h2>
 	                            <h3 id="thisLevel"></h3>
 	                            <hr class="star-primary">
-	                            	<svg id="graphA" style="width: 600px; height: 500px"></svg>
+	                        		</div>
+	                        		<div class="col-sm-2">
+	                        		<h2>vs.<h2>
+	                        		</div>
+	                        		<div class="col-sm-4">
+	                        		<h2>{{title2}}</h2>
+	                            <h3 id="thisLevel"></h3>
+	                            <hr class="star-primary">
+	                        		</div>
+	                        		<div class="col-sm-1"></div>
+	                        	</div>
+	                            
+	                            
+	                            <svg id="graphA" style="width: 1000px; height: 1000px"></svg>
 	                            <p>Use this area of the page to describe your project. The icon above is part of a free icon set by <a href="https://sellfy.com/p/8Q9P/jV3VZ/">Flat Icons</a>. On their website, you can download their free set with 16 icons, or you can purchase the entire set with 146 icons for only $12!</p>
 	                            <ul class="list-inline item-details">
 
@@ -340,27 +361,7 @@ text {
 	</div>
 	<!-- Classie -->
 		<script src="javascripts/classie.js"></script>
-		<script>
-			var menuLeft = document.getElementById( 'cbp-spmenu-s1' ),
-				showLeftPush = document.getElementById( 'showLeftPush' ),
-				body = document.body;
-				
-			showLeftPush.onclick = function() {
-				classie.toggle( this, 'active' );
-				classie.toggle( body, 'cbp-spmenu-push-toright' );
-				classie.toggle( menuLeft, 'cbp-spmenu-open' );
-				disableOther( 'showLeftPush' );
-			};
 
-			$( "#showLeftPush" ).trigger( "click" );
-			
-
-			function disableOther( button ) {
-				if( button !== 'showLeftPush' ) {
-					classie.toggle( showLeftPush, 'disabled' );
-				}
-			}
-		</script>
 
 	<!-- HANDLEBARS TEMPLATES -->
 
@@ -372,7 +373,7 @@ text {
 		<script src="https://code.highcharts.com/modules/exporting.js"></script>
 		<script src="https://code.highcharts.com/highcharts-more.js"></script>
 		<script src="https://code.highcharts.com/modules/solid-gauge.js"></script>
-		<script type="text/javascript" src="javascripts/recipe-scatter-highcharts.js"></script>
+		
 		
         <script type="text/javascript" src="javascripts/bootstrap.min.js"></script>
 
@@ -387,7 +388,11 @@ text {
 		<script src="javascripts/jquery.nicescroll.js"></script>
 		<script src="javascripts/scripts.js"></script>
 		<!--//scrolling js-->
+		<script src="/javascripts/kmeans.js"></script>
+		<script src="/javascripts/two-compare.js"></script>
+		<script src="/javascripts/two-listen.js"></script>
 		<script src="/javascripts/circle.js"></script>
+		<script type="text/javascript" src="javascripts/recipe-scatter-highcharts.js"></script>
 		<script src="/javascripts/node-select.js"></script>
 		<script src="/javascripts/controllers-client/progress.js"></script>
 		<script src="/javascripts/render-closed.js"></script>
@@ -400,7 +405,6 @@ text {
 		<script src="/javascripts/render-search.js"></script>
 
 		
-		<script src="/javascripts/two-listen.js"></script>
 		<script src="/javascripts/search.js"></script>
 	<!--	<script src="javascripts/freelancer.min.js"></script> -->
 		

@@ -1,118 +1,152 @@
 (function () {
 
-	function kmeans( arrayToProcess, Clusters )
-	{
+var kmeans = {}
 
-	  var Groups = new Array();
-	  var Centroids = new Array();
-	  var oldCentroids = new Array();
-	  var changed = false;
+kmeans.process = function(vector, k, callback) { 
+    if (!vector || !k || !callback) throw new Error(
+            "Provide 3 arguments: callback, vector, clusters")
+    
+    return new Kmeans(vector, k, callback)
+}
 
-	  // order the input array
-	  arrayToProcess.sort(function(a,b){return a - b})  
-	  
-	  // initialise group arrays
-	  for( initGroups=0; initGroups < Clusters; initGroups++ )
-	  {
-	  
-	    Groups[initGroups] = new Array();
+// Initialize
+// ----------
+function Kmeans (vector, k, callback) {
+    //**Vector:** array of arrays. Inner array
+    //represents a multidimensional data point (vector)  
+    //*These should be normalized*
+    this.callback = callback
+    this.vector = vector 
+    //**K:** represents the number of groups/clusters into 
+    //which the vectors will be grouped
+    this.k = k
+    //Initialize the centroids and clusters     
+    //**Centroids:** represent the center of each cluster. 
+    //They are taken by averaging each dimension of the vectors
+    this.centroids = new Array(k)
+    this.cluster = new Array(k) 
+    this.dummyCluster = [];
 
-	  }  
-	  
-	  // pick initial centroids
-	  
-	  initialCentroids=Math.round( arrayToProcess.length/(Clusters+1) );  
-	  
-	  for( i=0; i<Clusters; i++ )
-	  {
-	  
-	    Centroids[i]=arrayToProcess[ (initialCentroids*(i+1)) ];
-	  
-	  }
-	  
-	  do
-	  {
-	  
-	    for( j=0; j<Clusters; j++ )
-		{
-		
-		  Groups[j] = [];
-		
-		}
-	  
-	    changed=false;
-		
-		for( i=0; i<arrayToProcess.length; i++ )
-		{
+    //Create centroids and place them randomly because 
+    //we don't yet know where the vectors are most concentrated
+    this.createCentroids()
+    var count = 0
+        , notFinished = true
+    
+    this.iterate(this.centroids.slice(0))
+}
 
-		  Distance=-1;
-		  oldDistance=-1
-		
-	 	  for( j=0; j<Clusters; j++ )
-		  {
-		  
-	        distance = Math.abs( Centroids[j]-arrayToProcess[i] );	
-			
-			if ( oldDistance==-1 )
-			{
-			
-			   oldDistance = distance;
-			   newGroup = j;
-			
-			}
-			else if ( distance <= oldDistance )
-			{
-			  
-			    newGroup=j;
-				oldDistance = distance;
-			  
-			}
-		  
-		  }	
-		  
-		  Groups[newGroup].push( arrayToProcess[i] );	  
-		
-		}
-	  
-	    oldCentroids=Centroids;
-	  
-	    for ( j=0; j<Clusters; j++ )
-		{
-	  
-	      total=0;
-		  newCentroid=0;
-		  
-		  for( i=0; i<Groups[j].length; i++ )
-		  {
-		  
-		    total+=Groups[j][i];
-		  
-		  } 
-		
-		  newCentroid=total/Groups[newGroup].length;  
-		  
-		  Centroids[j]=newCentroid;
-		  
-		}
-	  
-	    for( j=0; j<Clusters; j++ )
-		{
-		
-		  if ( Centroids[j]!=oldCentroids[j] )
-		  {
-		  
-		    changed=true;
-		  
-		  }
-		
-		}
-	  
-	  }
-	  while( changed==true );
-	  
-	  return Groups;
-  
-	}
+// Assign vector to each centroid
+// ----------
+// Randomly choose **k** vectors from the vector 
+// array **vector**. These represent our guess 
+// at where clusters may exist. 
+Kmeans.prototype.createCentroids = function () {
+    var randomArray = this.vector.slice(0)
+    var self = this
+    randomArray.sort(function() {
+        return (Math.floor(Math.random() * self.vector.length))
+    });
+    this.centroids = randomArray.slice(0, this.k);
+}
+
+// Recursively cluster and move the centroids
+// ----------
+//This method groups vectors into clusters and then determine the 
+//the new location for each centroid based upon the mean
+//location of the vectors in the cooresponding cluster
+Kmeans.prototype.iterate = function (vecArray) {
+   
+    this.cluster = new Array(this.k) 
+    this.dummyCluster = [];
+    
+    var tempArray = []    
+    for (var a=0; a<this.vector[0].length; a++) {
+        tempArray.push(0)
+    }
+    var vecArray = []
+    for (var a=0; a<this.k; a++) {
+        vecArray[a] = (tempArray.slice(0))
+    }
+    //Group each vector to a cluster based upon the 
+    //cooresponding centroid
+    for (var i in this.vector) {
+        var v = this.vector[i].slice(0)
+        var index = this.assignCentroid(v)
+        
+        if (!this.cluster[index]) this.cluster[index]=[]
+        if (!this.dummyCluster[index]) this.dummyCluster[index]=[]
+            this.cluster[index].push(v)
+        
+            this.dummyCluster[index].push(i)
+
+        for (var a=0; a<v.length; a++){
+            vecArray[index][a]+=v[a] //keep a sum for cluster
+        }
+    }
+
+    //Calculate the mean values for each cluster.
+    var distance 
+        , max = 0 
+   
+    for (var a=0; a<this.k; a++) {
+        
+        var clusterSize = 0 //cluster is empty
+        if (this.cluster[a]) clusterSize = this.cluster[a].length
+        
+        for (var b in vecArray[a]) {
+            vecArray[a][b] = vecArray[a][b]/clusterSize
+        }
+        distance = this.distance(vecArray[a], this.centroids[a])
+        if (distance>max) 
+            max=distance
+    }
+    
+    if (max<=0.5)
+        return this.callback(null, this.dummyCluster, this.centroids)
+       
+    //For each centroid use the mean calculated for the 
+    //corresponding cluster (effectively "moving" the centroid
+    //to its new "location")
+    for (var z in vecArray) {
+        this.centroids[z] = vecArray[z].slice(0)
+    }
+    this.iterate(vecArray)
+
+}
+
+
+// Determine the closest centroid to a vector
+// ----------
+Kmeans.prototype.assignCentroid = function (point) {
+    var min = Infinity
+        , res = 0
+
+    //For each vector we determine the distance to the 
+    //nearest centroid. The vector is assigned to the 
+    //cluster that corresponds to the nearest centroid.
+    for (var i in this.centroids) {
+        dist = this.distance(point, this.centroids[i])
+        if (dist < min) {
+            min = dist
+            res = i       
+        }
+    }
+    return res
+}
+
+// Calculate euclidian distance between vectors
+// ----------
+Kmeans.prototype.distance = function(v1, v2) {
+    var total = 0
+    for (var c in v1) {
+        if (c!=0)
+        total += Math.pow(v2[c]-v1[c], 2)
+    }
+    return Math.sqrt(total)
+}
+
+window.kmeans = kmeans;
 
 })();
 

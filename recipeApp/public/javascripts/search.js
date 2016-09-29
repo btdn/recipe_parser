@@ -148,7 +148,7 @@ $("#searchBtn").click(function(event) {
 		window.sessionStorage.setItem('include', JSON.stringify(includeArr) );
 		window.sessionStorage.setItem('exclude', JSON.stringify(excludeArr) );
 	}
-//	window.location.href = "/";
+	window.location.href = "/";
 	//CircleRenderer.render(commonIndexes)
 	//				recipeChartView.render(finalResults);
 	/*				for(var i = 0; i < commonIndexes.length; i++) {

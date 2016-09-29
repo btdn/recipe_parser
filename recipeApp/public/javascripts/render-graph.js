@@ -173,7 +173,7 @@
 		  	RenderClosed.render();
 		  });
 		}); 
-		//AddListeners.listenNow();
+		AddListeners.listenNow();
 	    $(selector).html('');
 	    var svg = d3.select(selector);
 	    var inner = svg.append("g");

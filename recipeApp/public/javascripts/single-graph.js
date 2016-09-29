@@ -3,6 +3,8 @@
 
   var nodeList = [];
 
+  var colorList = ['#98fb98', '#FFB6C1', 'orange', 'blue', 'purple']
+
   var mostRecentNode = '';
 
   var seenBeforeIngrTotal = {};
@@ -341,53 +343,70 @@
       var freqInstr = [];
       for(key in seenBeforeInstrTotal) freqInstr.push({key: key, freq: seenBeforeInstrTotal[key]});
       freqInstr.sort(function(a,b){return b.freq - a.freq});
+      console.log(finalResults.length);
+      kmeans.process(finalResults, 4, function(err, res) {
+        if (err) throw new Error(err)
+          console.log(res);
+          finalResults = tsne(finalResults);
 
-      finalResults = tsne(finalResults);
 
-      for(var i = 0; i < finalResults.length;i++) {
-        finalResults[i] = {
-          id: i,
-          x:  finalResults[i][0],
-          y:  finalResults[i][1],
-        };
-        if (i == minIndex) {
-          finalResults[i].marker = {fillColor: 'green'};
-        }
-        if (i == maxIndex) {
-          finalResults[i].marker = {fillColor: 'red'};
-        }
-      } 
-      var commonIndexes = null;
-      console.log(window.sessionStorage.getItem("finalResults"));
-      console.log(window.sessionStorage.getItem("commonIndexes"));
-      if(window.sessionStorage.getItem("commonIndexes") && typeof window.sessionStorage.getItem('commonIndexes') !== "undefined") {
-        finalResults = JSON.parse(window.sessionStorage.getItem("finalResults") );
-        commonIndexes = JSON.parse(window.sessionStorage.getItem("commonIndexes") );
-        console.log(commonIndexes);
-        recipeChartView.render(finalResults);
-          for(var i = 0; i < commonIndexes.length; i++) {
-        //    if(finalResults[i].marker)
-       //     GraphRenderer.render(commonIndexes[i]);
-            if(!finalResults[commonIndexes[i]].marker) {
-              finalResults[commonIndexes[i]].marker = {fillColor: 'purple'};  
-            }
+      
+        for(var i = 0; i < finalResults.length;i++) {
+          finalResults[i] = {
+            id: i,
+            x:  finalResults[i][0],
+            y:  finalResults[i][1],
+          };
+
+        } 
+
+        for(var j = 0; j < res.length; j++) {
+          var cluster = res[j];
+          console.log(cluster);
+          var color = colorList[j];
+          if (!cluster) { continue; }
+          for(var k = 0; k < cluster.length; k++) {
+            finalResults[cluster[k]].marker = {fillColor: color};
           }
-      } else {
-        window.sessionStorage.setItem("finalResults", JSON.stringify(finalResults) );
-      }
-      recipeChartView.render(finalResults);
-
-      window.sessionStorage.setItem('currSearch', JSON.stringify(currSearch) );
-      var pairs = [];
-      for(var i = 1; i < 5; i++) {
-        for(var j = 1; j < 4; j++) {
-          pairs.push([i, j]);
         }
-      }
-      window.sessionStorage.setItem('pairs', JSON.stringify(pairs));
-      window.sessionStorage.setItem('currGraphIndex', 0);
-      GraphRenderer.render(minIndex, freqIngr, freqInstr);
-      CircleRenderer.render(commonIndexes);
+
+        finalResults[minIndex].marker = {fillColor: 'black', lineColor: 'green', lineWidth: '3'};
+        finalResults[maxIndex].marker = {fillColor: 'black', lineColor: 'red', lineWidth: '3'};
+
+        var commonIndexes = null;
+        console.log(window.sessionStorage.getItem("finalResults"));
+        console.log(window.sessionStorage.getItem("commonIndexes"));
+        if(window.sessionStorage.getItem("commonIndexes") && typeof window.sessionStorage.getItem('commonIndexes') !== "undefined") {
+          finalResults = JSON.parse(window.sessionStorage.getItem("finalResults") );
+          commonIndexes = JSON.parse(window.sessionStorage.getItem("commonIndexes") );
+          console.log(commonIndexes);
+          recipeChartView.render(finalResults);
+            for(var i = 0; i < commonIndexes.length; i++) {
+          //    if(finalResults[i].marker)
+         //     GraphRenderer.render(commonIndexes[i]);
+              if(!finalResults[commonIndexes[i]].marker) {
+                finalResults[commonIndexes[i]].marker = {fillColor: 'purple'};  
+              }
+            }
+        } else {
+          window.sessionStorage.setItem("finalResults", JSON.stringify(finalResults) );
+        }
+        recipeChartView.render(finalResults);
+
+        window.sessionStorage.setItem('currSearch', JSON.stringify(currSearch) );
+        var pairs = [];
+        for(var i = 1; i < 5; i++) {
+          for(var j = 1; j < 4; j++) {
+            pairs.push([i, j]);
+          }
+        }
+        window.sessionStorage.setItem('pairs', JSON.stringify(pairs));
+        window.sessionStorage.setItem('currGraphIndex', 0);
+        GraphRenderer.render(minIndex, freqIngr, freqInstr);
+        CircleRenderer.render(commonIndexes);
+      }); 
+
+
     });
   };
   window.RenderInstance = RenderInstance;
