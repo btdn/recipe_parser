@@ -195,8 +195,11 @@
 	    	}
 	    	$("body").removeClass("stop-scrolling");
 	    	$("html").removeClass("stop-scrolling");
-	    });
+	    })
 	    svg.call(zoom);
+	    svg.on("wheel.zoom", null);
+        svg.on("mousewheel.zoom", null);
+
 
 	    $("#Check"+index).click(function() {
 	    	$('#graph'+index).click();

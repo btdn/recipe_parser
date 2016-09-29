@@ -131,8 +131,10 @@
           .append("g")
           .attr("class", function(d, i) {
             if(simHist[i]) {
+              jsonText[i].selected = true;
               return "selected";
             }
+            jsonText[i].selected = false;
             return "unselected";
           })
           .attr("id", function(d, i) {
@@ -153,14 +155,44 @@
       var counter = 0;
       var xCounter = 40;
       var yCounter = 20;
+      var flag = false;
+      console.log(justInstr[0].length);
       d3.selectAll(".unselected")
         .transition()
         .duration(1000)
         .ease('cubic')
-        .attr("transform", function(v, i) { counter += 1; yCounter += 70; if(counter === justInstr[0].length) {yCounter = 90; xCounter = 750;}; return "translate("+(xCounter-$(this).find("rect").attr("x"))+","+(yCounter-$(this).find("rect").attr("y"))+")"})
+        .attr("transform", function(v, i) { 
+          counter += 1; yCounter += 70;
+          if($(this).find("rect").attr("index") >= justInstr[0].length && !flag) {
+            flag = true; yCounter = 90; xCounter = 750;
+          } 
+          return "translate("+(xCounter-$(this).find("rect").attr("x"))+","+(yCounter-$(this).find("rect").attr("y"))+")"})
 
-        counter += 1;
-        yCounter += 70;
+       //     var unselected = [];
+       //     for(var i = 0; i < jsonText.length; i++) {
+       //        if(!jsonText[i].selected) {
+       //          unselected.push(jsonText[i]);
+
+       //        }
+       //     }
+       //     var g = container.selectAll("g")
+
+
+       //    .data(unselected)
+
+       // //     .each(function(d, i) {
+           
+       //          .transition()
+       //        .duration(1000)
+       //        .ease('cubic')
+
+       //        .attr("transform", function(d, i) { counter += 1; yCounter += 70; if(i === justInstr[0].length) {yCounter = 90; xCounter = 900;}; return "translate("+(xCounter-d.x)+","+(yCounter-d.y)+")"})
+
+              
+
+
+
+       //     });
       d3.selectAll(".lineUnselected")
         .attr("opacity", 0)
         
@@ -173,6 +205,7 @@
       .attr("height", 50)
   //    .attr("class", "shape")
       .attr("stroke", "black")
+      .attr("index", function(d, i) { return i } )
       .attr("fill", function(d, i) { if(simHist[i]) {
         return "gray";
       } else {
@@ -190,6 +223,7 @@
       .text(function(d) { return d.text })
       .style("font-family","Avenir")
       .attr("font-size", "10px")
+      .attr("index", function(d, i) { return i } )
       .each(function(d){
           d3plus.textwrap().container(d3.select(this)).draw();
           console.log(d3plus);

@@ -7,6 +7,7 @@ $(function () {
         var rectangle;
         var chart = new Highcharts.Chart({
             chart: {
+                backgroundColor: '#bdbdbd',
                 renderTo: 'containerRecipeChart',
                     type: 'scatter',
                     style: {fontFamily: 'Avenir'},
@@ -26,32 +27,37 @@ $(function () {
                                         height: yMax - yMin
                                     });
                                     var commonIndexes = [];
+                                    console.log(this.series[0].data);
                                     for (var i = 0; i < this.series[0].data.length; i++) {
                                         var point = this.series[0].data[i];
-                                        if(point.marker.lineWidth < 2) {
+                                        console.log(point);
+                                        if(point.marker.lineColor === 'black') {
                                             point.update({marker: {
                                                 fillColor: point.marker.fillColor,
+                                                lineColor: 'gray',
                                             }
 
                                             });
-                                        }
+                                         }
                                         
                                         if (point.x > event.xAxis[0].min &&
                                             point.x < event.xAxis[0].max &&
                                             point.y > event.yAxis[0].min &&
                                             point.y < event.yAxis[0].max) {
                                                 commonIndexes.push(point.id);
-                                                GraphRenderer.render(point.id);
+                                                
                                                 point.update({marker: {
                                                     fillColor: point.marker.fillColor,
                                                     lineColor: 'black',
-                                                    lineWidth: '1.5'
+                                                    lineWidth: 3,
                                                 }
 
                                                 });
+                                                GraphRenderer.render(point.id);
                                     
                                         }
                                     }
+                                    console.log(this.series[0].data);
                                     CircleRenderer.render(commonIndexes);
                             
                                     return false;
@@ -70,7 +76,8 @@ $(function () {
                 title: {
                     text: 'Recipe Map'
                 },
-                xAxis: {
+                xAxis: { 
+                    gridLineWidth: 0,
                     labels: {
                 enabled: false
             },
@@ -88,6 +95,8 @@ $(function () {
                   }]
                 },
                 yAxis: {
+                                    gridLineWidth: 0,
+                minorGridLineWidth: 0,
                     title: {
                 text: null
             },
@@ -118,6 +127,8 @@ $(function () {
                     scatter: {
                         marker: {
                             radius: 3.5,
+                            lineColor: 'gray',
+                            lineWidth: 1.25,
                             states: {
                                 hover: {
                                     enabled: true,
@@ -141,8 +152,8 @@ $(function () {
                     point: {
                         events: {
                             click: function() {
-                                this.setState("select");
-
+                                this.update({marker: {fillColor: this.marker.fillColor, lineColor: 'gray', lineWidth: 3}})
+                                GraphRenderer.render(this.id); 
                             },
 
                              

@@ -370,8 +370,8 @@
           }
         }
 
-        finalResults[minIndex].marker = {fillColor: 'black', lineColor: 'green', lineWidth: '3'};
-        finalResults[maxIndex].marker = {fillColor: 'black', lineColor: 'red', lineWidth: '3'};
+        finalResults[minIndex].marker = {radius: 4.5, fillColor: 'white', lineWidth: 3, lineColor: 'green'};
+        finalResults[maxIndex].marker = {radius: 4.5, fillColor: 'white', lineColor: 'red', lineWidth: 3};
 
         var commonIndexes = null;
         console.log(window.sessionStorage.getItem("finalResults"));
